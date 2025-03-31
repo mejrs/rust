@@ -45,6 +45,7 @@ use tracing::{debug, instrument};
 use super::explain_borrow::{BorrowExplanation, LaterUseKind};
 use super::{DescribePlaceOpt, RegionName, RegionNameSource, UseSpans};
 use crate::borrow_set::{BorrowData, TwoPhaseActivation};
+use crate::consumers::OutlivesConstraint;
 use crate::diagnostics::conflict_errors::StorageDeadOrDrop::LocalStorageDead;
 use crate::diagnostics::{CapturedMessageOpt, call_kind, find_all_local_uses};
 use crate::prefixes::IsPrefixOf;
@@ -2851,6 +2852,7 @@ impl<'infcx, 'tcx> MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         let explanation = self.explain_why_borrow_contains_point(location, borrow, kind_place);
 
         debug!(?place_desc, ?explanation);
+        dbg!(&place_desc, &explanation);
 
         let mut err = match (place_desc, explanation) {
             // If the outlives constraint comes from inside the closure,
@@ -3022,6 +3024,14 @@ impl<'infcx, 'tcx> MirBorrowckCtxt<'_, 'infcx, 'tcx> {
             } else {
                 explanation.add_explanation_to_diagnostic(&self, &mut err, "", None, None);
             }
+        } else if let Some((span, region)) = self.is_questionmark_desugaring(&explanation) {
+            err.span_label(
+                span,
+                format!("this use of the `?` operator requires that `{name}` can be borrowed for `{region}`"),
+            );
+
+            // TODO: Some way to say...{region} required to satisfy `impl From<A> for B`
+            err.span_label(drop_span, format!("`{name}` dropped here while still borrowed"));
         } else {
             err.span_label(borrow_span, "borrowed value does not live long enough");
             err.span_label(drop_span, format!("`{name}` dropped here while still borrowed"));
@@ -3948,6 +3958,31 @@ impl<'infcx, 'tcx> MirBorrowckCtxt<'_, 'infcx, 'tcx> {
             Some(FakeReadCause::ForIndex) => Some("indexing expression"),
             _ => None,
         }
+    }
+
+    fn is_questionmark_desugaring(
+        &self,
+        explanation: &BorrowExplanation<'tcx>,
+    ) -> Option<(Span, RegionName)> {
+        let BorrowExplanation::MustBeValidFor { path, region_name, .. } = explanation else {
+            return None;
+        };
+
+        let Some(ret) = path
+            .iter()
+            .filter_map(|OutlivesConstraint { span, .. }| {
+                if span.is_desugaring(DesugaringKind::QuestionMark) {
+                    Some((*span, *region_name))
+                } else {
+                    None
+                }
+            })
+            .next()
+        else {
+            return None;
+        };
+
+        Some(ret)
     }
 
     /// Annotate argument and return type of function and closure with (synthesized) lifetime for
