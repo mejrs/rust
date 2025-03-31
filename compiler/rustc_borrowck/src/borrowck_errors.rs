@@ -13,6 +13,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         self.infcx.dcx()
     }
 
+    #[track_caller]
     pub(crate) fn cannot_move_when_borrowed(
         &self,
         span: Span,
@@ -30,6 +31,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         })
     }
 
+    #[track_caller]
     pub(crate) fn cannot_use_when_mutably_borrowed(
         &self,
         span: Span,
@@ -48,6 +50,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(span, format!("use of borrowed {borrow_desc}"))
     }
 
+    #[track_caller]
     pub(crate) fn cannot_mutably_borrow_multiply(
         &self,
         new_loan_span: Span,
@@ -97,6 +100,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         err
     }
 
+    #[track_caller]
     pub(crate) fn cannot_uniquely_borrow_by_two_closures(
         &self,
         new_loan_span: Span,
@@ -126,6 +130,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         err
     }
 
+    #[track_caller]
     pub(crate) fn cannot_uniquely_borrow_by_one_closure(
         &self,
         new_loan_span: Span,
@@ -157,6 +162,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         err
     }
 
+    #[track_caller]
     pub(crate) fn cannot_reborrow_already_uniquely_borrowed(
         &self,
         new_loan_span: Span,
@@ -189,6 +195,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         err
     }
 
+    #[track_caller]
     pub(crate) fn cannot_reborrow_already_borrowed(
         &self,
         span: Span,
@@ -236,6 +243,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         err
     }
 
+    #[track_caller]
     pub(crate) fn cannot_assign_to_borrowed(
         &self,
         span: Span,
@@ -253,6 +261,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(span, format!("{desc} is assigned to here but it was already borrowed"))
     }
 
+    #[track_caller]
     pub(crate) fn cannot_reassign_immutable(
         &self,
         span: Span,
@@ -263,10 +272,12 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         struct_span_code_err!(self.dcx(), span, E0384, "cannot assign {} {}", msg, desc)
     }
 
+    #[track_caller]
     pub(crate) fn cannot_assign(&self, span: Span, desc: &str) -> Diag<'infcx> {
         struct_span_code_err!(self.dcx(), span, E0594, "cannot assign to {}", desc)
     }
 
+    #[track_caller]
     pub(crate) fn cannot_move_out_of(
         &self,
         move_from_span: Span,
@@ -284,6 +295,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
     /// Signal an error due to an attempt to move out of the interior
     /// of an array or slice. `is_index` is None when error origin
     /// didn't capture whether there was an indexing operation or not.
+    #[track_caller]
     pub(crate) fn cannot_move_out_of_interior_noncopy(
         &self,
         move_from_span: Span,
@@ -306,6 +318,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(move_from_span, "cannot move out of here")
     }
 
+    #[track_caller]
     pub(crate) fn cannot_move_out_of_interior_of_drop(
         &self,
         move_from_span: Span,
@@ -321,6 +334,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(move_from_span, "cannot move out of here")
     }
 
+    #[track_caller]
     pub(crate) fn cannot_act_on_moved_value(
         &self,
         use_span: Span,
@@ -341,6 +355,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         )
     }
 
+    #[track_caller]
     pub(crate) fn cannot_borrow_path_as_mutable_because(
         &self,
         span: Span,
@@ -357,6 +372,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         )
     }
 
+    #[track_caller]
     pub(crate) fn cannot_mutate_in_immutable_section(
         &self,
         mutate_span: Span,
@@ -378,6 +394,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(immutable_span, format!("value is immutable in {immutable_section}"))
     }
 
+    #[track_caller]
     pub(crate) fn cannot_borrow_across_coroutine_yield(
         &self,
         span: Span,
@@ -416,6 +433,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         diag
     }
 
+    #[track_caller]
     pub(crate) fn cannot_borrow_across_destructor(&self, borrow_span: Span) -> Diag<'infcx> {
         struct_span_code_err!(
             self.dcx(),
@@ -425,10 +443,12 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         )
     }
 
+    #[track_caller]
     pub(crate) fn path_does_not_live_long_enough(&self, span: Span, path: &str) -> Diag<'infcx> {
         struct_span_code_err!(self.dcx(), span, E0597, "{} does not live long enough", path,)
     }
 
+    #[track_caller]
     pub(crate) fn cannot_return_reference_to_local(
         &self,
         span: Span,
@@ -451,6 +471,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         )
     }
 
+    #[track_caller]
     pub(crate) fn cannot_capture_in_long_lived_closure(
         &self,
         closure_span: Span,
@@ -470,6 +491,7 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         .with_span_label(closure_span, format!("may outlive borrowed value {borrowed_path}"))
     }
 
+    #[track_caller]
     pub(crate) fn thread_local_value_does_not_live_long_enough(&self, span: Span) -> Diag<'infcx> {
         struct_span_code_err!(
             self.dcx(),
@@ -479,11 +501,13 @@ impl<'infcx, 'tcx> crate::MirBorrowckCtxt<'_, 'infcx, 'tcx> {
         )
     }
 
+    #[track_caller]
     pub(crate) fn temporary_value_borrowed_for_too_long(&self, span: Span) -> Diag<'infcx> {
         struct_span_code_err!(self.dcx(), span, E0716, "temporary value dropped while borrowed",)
     }
 }
 
+#[track_caller]
 pub(crate) fn borrowed_data_escapes_closure<'tcx>(
     tcx: TyCtxt<'tcx>,
     escape_span: Span,
