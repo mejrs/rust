@@ -6,6 +6,8 @@ The tracking issue for this feature is: [#29599]
 
 ------------------------
 
+> This feature is expected to be removed in favor of [`macro_metavar_expr_concat`](./macro-metavar-expr-concat.md).
+
 The `concat_idents` feature adds a macro for concatenating multiple identifiers
 into one identifier.
 
