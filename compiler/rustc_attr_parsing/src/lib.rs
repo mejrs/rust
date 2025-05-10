@@ -92,6 +92,5 @@ mod session_diagnostics;
 pub use attributes::cfg::*;
 pub use attributes::util::{find_crate_name, is_builtin_attr, parse_version};
 pub use context::{AttributeParser, OmitDoc};
-pub use rustc_attr_data_structures::*;
 
 rustc_fluent_macro::fluent_messages! { "../messages.ftl" }
