@@ -1,0 +1,16 @@
+error[E0277]: cannot format `A` with format specifier `X`
+  --> $DIR/fmt_traits.rs:20:25
+   |
+LL |     format!("the thing: {a:X}");
+   |                         ^^^^^
+   |
+   = note: the format specifier `X` forwards to trait `UpperHex`, but `A` does not implement it
+   = help: `A` implements the following formatting traits:
+           `Display`, which can be invoked by omitting the format specifier
+           `Debug`, which can be invoked with the `?` format specifier
+           `Pointer`, which can be invoked with the `p` format specifier
+           
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.

@@ -1,12 +1,11 @@
 use core::ops::ControlFlow;
-use std::borrow::Cow;
 
 use rustc_ast::visit::Visitor;
 use rustc_ast::*;
 use rustc_data_structures::fx::FxIndexMap;
 use rustc_hir as hir;
 use rustc_session::config::FmtDebug;
-use rustc_span::{Ident, Span, Symbol, kw, sym};
+use rustc_span::{DesugaringKind, Ident, Span, Symbol, kw, sym};
 
 use super::LoweringContext;
 
@@ -15,10 +14,19 @@ impl<'hir> LoweringContext<'_, 'hir> {
         // Never call the const constructor of `fmt::Arguments` if the
         // format_args!() had any arguments _before_ flattening/inlining.
         let allow_const = fmt.arguments.all_args().is_empty();
-        let mut fmt = Cow::Borrowed(fmt);
+
+        let mut fmt = fmt.clone();
+
+        let sp = self.mark_span_with_reason(
+            DesugaringKind::FormatLiteral,
+            sp,
+            sp.ctxt().outer_expn_data().allow_internal_unstable,
+        );
+
+        self.mark_spans(&mut fmt);
         if self.tcx.sess.opts.unstable_opts.flatten_format_args {
-            fmt = flatten_format_args(fmt);
-            fmt = self.inline_literals(fmt);
+            flatten_format_args(&mut fmt);
+            self.inline_literals(&mut fmt);
         }
         expand_format_args(self, sp, &fmt, allow_const)
     }
@@ -80,7 +88,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     /// into
     ///
     /// `format_args!("Hello, World! 123 {}", x)`.
-    fn inline_literals<'fmt>(&self, mut fmt: Cow<'fmt, FormatArgs>) -> Cow<'fmt, FormatArgs> {
+    fn inline_literals(&self, fmt: &mut FormatArgs) {
         let mut was_inlined = vec![false; fmt.arguments.all_args().len()];
         let mut inlined_anything = false;
 
@@ -99,9 +107,6 @@ impl<'hir> LoweringContext<'_, 'hir> {
             }
 
             if let Some(literal) = literal {
-                // Now we need to mutate the outer FormatArgs.
-                // If this is the first time, this clones the outer FormatArgs.
-                let fmt = fmt.to_mut();
                 // Replace the placeholder with the literal.
                 fmt.template[i] = FormatArgsPiece::Literal(literal);
                 was_inlined[arg_index] = true;
@@ -111,8 +116,6 @@ impl<'hir> LoweringContext<'_, 'hir> {
 
         // Remove the arguments that were inlined.
         if inlined_anything {
-            let fmt = fmt.to_mut();
-
             let mut remove = was_inlined;
 
             // Don't remove anything that's still used.
@@ -135,8 +138,28 @@ impl<'hir> LoweringContext<'_, 'hir> {
             // Correct the indexes that refer to arguments that have shifted position.
             for_all_argument_indexes(&mut fmt.template, |index| *index = index_map[*index]);
         }
+    }
 
-        fmt
+    /// Mark everything that originated from the format string literal with `DesugaringKind::FormatLiteral`.
+    fn mark_spans(&self, fmt: &mut FormatArgs) {
+        let mark = |span: &mut Span| {
+            *span = self.mark_span_with_reason(DesugaringKind::FormatLiteral, *span, None);
+        };
+
+        let FormatArgs { span, template, arguments, uncooked_fmt_str: _ } = fmt;
+        mark(span);
+        for piece in template {
+            let FormatArgsPiece::Placeholder(f) = piece else { continue };
+            if matches!(f.argument.kind, FormatArgPositionKind::Named) {
+                if let Some(sp) = &mut f.span {
+                    mark(sp);
+                }
+            }
+        }
+        for arg in arguments.all_args_mut() {
+            let FormatArgumentKind::Captured(Ident { span, .. }) = &mut arg.kind else { continue };
+            mark(span);
+        }
     }
 }
 
@@ -149,7 +172,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
 /// into
 ///
 /// `format_args!("a {} b{}! {}.", 1, 2, 3)`.
-fn flatten_format_args(mut fmt: Cow<'_, FormatArgs>) -> Cow<'_, FormatArgs> {
+fn flatten_format_args(fmt: &mut FormatArgs) {
     let mut i = 0;
     while i < fmt.template.len() {
         if let FormatArgsPiece::Placeholder(placeholder) = &fmt.template[i]
@@ -164,10 +187,6 @@ fn flatten_format_args(mut fmt: Cow<'_, FormatArgs>) -> Cow<'_, FormatArgs> {
                     if placeholder.argument.index == Ok(arg_index))
             )
         {
-            // Now we need to mutate the outer FormatArgs.
-            // If this is the first time, this clones the outer FormatArgs.
-            let fmt = fmt.to_mut();
-
             // Take the inner FormatArgs out of the outer arguments, and
             // replace it by the inner arguments. (We can't just put those at
             // the end, because we need to preserve the order of evaluation.)
@@ -214,7 +233,6 @@ fn flatten_format_args(mut fmt: Cow<'_, FormatArgs>) -> Cow<'_, FormatArgs> {
             i += 1;
         }
     }
-    fmt
 }
 
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]

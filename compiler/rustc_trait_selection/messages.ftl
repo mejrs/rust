@@ -468,3 +468,12 @@ trait_selection_where_copy_predicates = copy the `where` clause predicates from 
 trait_selection_where_remove = remove the `where` clause
 trait_selection_wrapped_parser_error = {$description}
     .label = {$label}
+
+trait_selection_format_trait_unimplemented = cannot format `{$ty}` with format specifier `{$spec}`
+    .label = format specifier specified here
+    .note = the format specifier `{$spec}` forwards to trait `{$fmt_trait}`, but `{$ty}` does not implement it
+    .help = {$sugg}
+
+trait_selection_default_format_trait_unimplemented = cannot format `{$ty}` with the default formatter
+    .note = the default format specifier forwards to trait `{$fmt_trait}`, but `{$ty}` does not implement it
+    .help = {$sugg}

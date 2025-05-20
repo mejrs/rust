@@ -1902,3 +1902,30 @@ pub(crate) struct NonGenericOpaqueTypeParam<'a, 'tcx> {
     #[label]
     pub param_span: Span,
 }
+
+#[derive(Diagnostic)]
+#[diag(trait_selection_format_trait_unimplemented, code = E0277)]
+#[note]
+pub(crate) struct FormatTraitUnimplemented<'tcx> {
+    #[primary_span]
+    pub span: Span,
+    pub ty: Ty<'tcx>,
+    pub fmt_trait: TraitRefPrintOnlyTraitPath<'tcx>,
+    pub spec: &'static str,
+    #[help]
+    pub print_help: bool,
+    pub sugg: String,
+}
+
+#[derive(Diagnostic)]
+#[diag(trait_selection_default_format_trait_unimplemented, code = E0277)]
+#[note]
+pub(crate) struct DefaultFormatTraitUnimplemented<'tcx> {
+    #[primary_span]
+    pub span: Span,
+    pub ty: Ty<'tcx>,
+    pub fmt_trait: TraitRefPrintOnlyTraitPath<'tcx>,
+    #[help]
+    pub print_help: bool,
+    pub sugg: String,
+}

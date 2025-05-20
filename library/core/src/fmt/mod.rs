@@ -1057,6 +1057,7 @@ pub trait Display {
 /// assert_eq!(format!("l as octal is: {l:#06o}"), "l as octal is: 0o0011");
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "Octal"]
 pub trait Octal {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]
@@ -1116,6 +1117,7 @@ pub trait Octal {
 /// );
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "Binary"]
 pub trait Binary {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]
@@ -1171,6 +1173,7 @@ pub trait Binary {
 /// assert_eq!(format!("l as hex is: {l:#010x}"), "l as hex is: 0x00000009");
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "LowerHex"]
 pub trait LowerHex {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]
@@ -1226,6 +1229,7 @@ pub trait LowerHex {
 /// assert_eq!(format!("l as hex is: {l:#010X}"), "l as hex is: 0x7FFFFFFF");
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "UpperHex"]
 pub trait UpperHex {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]
@@ -1336,6 +1340,7 @@ pub trait Pointer {
 /// );
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "LowerExp"]
 pub trait LowerExp {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]
@@ -1387,6 +1392,7 @@ pub trait LowerExp {
 /// );
 /// ```
 #[stable(feature = "rust1", since = "1.0.0")]
+#[rustc_diagnostic_item = "UpperExp"]
 pub trait UpperExp {
     #[doc = include_str!("fmt_trait_method_doc.md")]
     #[stable(feature = "rust1", since = "1.0.0")]

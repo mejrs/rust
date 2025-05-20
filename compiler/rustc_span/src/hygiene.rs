@@ -1213,6 +1213,8 @@ pub enum DesugaringKind {
     Contract,
     /// A pattern type range start/end
     PatTyRange,
+    /// A format literal, for example in `format!("literal")` or `write!(writee, "literal")`.
+    FormatLiteral,
 }
 
 impl DesugaringKind {
@@ -1231,6 +1233,7 @@ impl DesugaringKind {
             DesugaringKind::BoundModifier => "trait bound modifier",
             DesugaringKind::Contract => "contract check",
             DesugaringKind::PatTyRange => "pattern type",
+            DesugaringKind::FormatLiteral => "format string literal",
         }
     }
 
@@ -1250,6 +1253,7 @@ impl DesugaringKind {
             DesugaringKind::BoundModifier => value == "BoundModifier",
             DesugaringKind::Contract => value == "Contract",
             DesugaringKind::PatTyRange => value == "PatTyRange",
+            DesugaringKind::FormatLiteral => value == "FormatLiteral",
         }
     }
 }

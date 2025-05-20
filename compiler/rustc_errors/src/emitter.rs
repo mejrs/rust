@@ -298,7 +298,7 @@ pub trait Emitter: Translate {
                     ExpnKind::Desugaring(..) | ExpnKind::AstPass(..) => None,
 
                     ExpnKind::Macro(macro_kind, name) => {
-                        Some((macro_kind, name, expn_data.hide_backtrace))
+                        Some((macro_kind, name, expn_data.hide_backtrace || expn_data.allow_internal_unstable.is_some()))
                     }
                 }
             })

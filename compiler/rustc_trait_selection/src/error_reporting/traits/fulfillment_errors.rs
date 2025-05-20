@@ -30,7 +30,7 @@ use rustc_middle::ty::{
     Upcast,
 };
 use rustc_middle::{bug, span_bug};
-use rustc_span::{BytePos, DUMMY_SP, STDLIB_STABLE_CRATES, Span, Symbol, sym};
+use rustc_span::{BytePos, DUMMY_SP, DesugaringKind, STDLIB_STABLE_CRATES, Span, Symbol, sym};
 use tracing::{debug, instrument};
 
 use super::on_unimplemented::{AppendConstMessage, OnUnimplementedNote};
@@ -44,6 +44,7 @@ use crate::error_reporting::infer::TyCategory;
 use crate::error_reporting::traits::report_dyn_incompatibility;
 use crate::errors::{
     AsyncClosureNotFn, ClosureFnMutLabel, ClosureFnOnceLabel, ClosureKindMismatch,
+    DefaultFormatTraitUnimplemented, FormatTraitUnimplemented,
 };
 use crate::infer::{self, InferCtxt, InferCtxtExt as _};
 use crate::traits::query::evaluate_obligation::InferCtxtExt as _;
@@ -69,7 +70,7 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
 
         let mut err = match *error {
             SelectionError::Unimplemented => {
-                // If this obligation was generated as a result of well-formedness checking, see if we
+                            // If this obligation was generated as a result of well-formedness checking, see if we
                 // can get a better error message by performing HIR-based well-formedness checking.
                 if let ObligationCauseCode::WellFormed(Some(wf_loc)) =
                     root_obligation.cause.code().peel_derives()
@@ -164,6 +165,12 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                             leaf_trait_predicate,
                         ) {
                             return guar;
+                        }
+
+                        if matches!(span.desugaring_kind(), Some(DesugaringKind::FormatLiteral)){
+                            if let Some(guar) = self.format_trait_error(span, root_obligation){
+                                return guar;
+                            }
                         }
 
                         if let Err(guar) = leaf_trait_predicate.error_reported()
@@ -3348,5 +3355,103 @@ impl<'a, 'tcx> TypeErrCtxt<'a, 'tcx> {
                 )
             }
         }
+    }
+
+    fn format_trait_error(
+        &self,
+        span: Span,
+        root_obligation: &PredicateObligation<'tcx>,
+    ) -> Option<ErrorGuaranteed> {
+        let fmt_trait_bonanza = [
+            (sym::Display, None),
+            (sym::Debug, Some("?")),
+            (sym::Octal, Some("o")),
+            (sym::LowerHex, Some("x")),
+            (sym::UpperHex, Some("X")),
+            (sym::Pointer, Some("p")),
+            (sym::Binary, Some("b")),
+            (sym::LowerExp, Some("e")),
+            (sym::UpperExp, Some("E")),
+        ];
+
+        let items = fmt_trait_bonanza.map(|(s, spec)| (s, self.tcx.get_diagnostic_item(s), spec));
+
+        let Some(root_pred) = root_obligation.predicate.as_trait_clause() else { return None };
+        let Some(this_fmt_trait) =
+            items.iter().find(|(_, t, _)| *t == Some(root_pred.skip_binder().def_id()))
+        else {
+            // Is this not a formatting trait? Or are the diagnostic items not available?
+            return None;
+        };
+
+        let ty = root_pred.skip_binder().self_ty();
+        let fmt_trait = root_pred.skip_binder().trait_ref.print_only_trait_path();
+
+        let other_fmt_traits: Vec<(Symbol, Option<&str>)> = items
+            .into_iter()
+            .filter_map(|(s, t, spec)| {
+                t.and_then(|format_trait| {
+                    if self
+                        .infcx
+                        .type_implements_trait(format_trait, [ty], root_obligation.param_env)
+                        .must_apply_modulo_regions()
+                    {
+                        Some((s, spec))
+                    } else {
+                        None
+                    }
+                })
+            })
+            .collect();
+        let sugg = match &*other_fmt_traits {
+            [] => String::new(),
+            [(_display, None)] => format!(
+                "`{ty}` implements `Display`; which can be invoked by omitting the format specifier"
+            ),
+            [(other, Some(spec))] => format!(
+                "`{ty}` implements `{other}`; which can be invoked by the `{spec}` format specifier",
+            ),
+            [several @ ..] => {
+                use std::fmt::Write;
+
+                let mut sugg = format!("`{ty}` implements the following formatting traits:\n");
+                for (fmt_trait, spec) in several {
+                    if let Some(spec) = spec {
+                        write!(
+                            &mut sugg,
+                            "`{fmt_trait}`, which can be invoked with the `{spec}` format specifier\n",
+                        )
+                        .unwrap();
+                    } else {
+                        write!(
+                            &mut sugg,
+                            "`Display`, which can be invoked by omitting the format specifier\n"
+                        )
+                        .unwrap();
+                    }
+                }
+                sugg
+            }
+        };
+
+        let guar = if let (_, _, Some(spec)) = this_fmt_trait {
+            self.dcx().emit_err(FormatTraitUnimplemented {
+                span,
+                ty,
+                fmt_trait,
+                spec,
+                print_help: !other_fmt_traits.is_empty(),
+                sugg,
+            })
+        } else {
+            self.dcx().emit_err(DefaultFormatTraitUnimplemented {
+                span,
+                ty,
+                fmt_trait,
+                print_help: !other_fmt_traits.is_empty(),
+                sugg,
+            })
+        };
+        Some(guar)
     }
 }
