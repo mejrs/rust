@@ -23,10 +23,10 @@ LL | #[diagnostic::on_unimplemented(message = "Test {1:}")]
    = help: only named format arguments with the name of one of the generic types are allowed in this context
 
 warning: invalid format specifier
-  --> $DIR/broken_format.rs:17:42
+  --> $DIR/broken_format.rs:17:48
    |
 LL | #[diagnostic::on_unimplemented(message = "Test {Self:123}")]
-   |                                          ^^^^^^^^^^^^^^^^^
+   |                                                ^^^^^^^^^^
    |
    = help: no format specifier are supported in this position
 
@@ -126,10 +126,10 @@ LL | fn check_3(_: impl ImportantTrait3) {}
    |                    ^^^^^^^^^^^^^^^ required by this bound in `check_3`
 
 warning: invalid format specifier
-  --> $DIR/broken_format.rs:17:42
+  --> $DIR/broken_format.rs:17:48
    |
 LL | #[diagnostic::on_unimplemented(message = "Test {Self:123}")]
-   |                                          ^^^^^^^^^^^^^^^^^
+   |                                                ^^^^^^^^^^
    |
    = help: no format specifier are supported in this position
    = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`

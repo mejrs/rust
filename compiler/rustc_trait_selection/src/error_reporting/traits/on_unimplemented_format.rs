@@ -10,7 +10,7 @@ use rustc_parse_format::{
 };
 use rustc_session::lint::builtin::UNKNOWN_OR_MALFORMED_DIAGNOSTIC_ATTRIBUTES;
 use rustc_span::def_id::DefId;
-use rustc_span::{BytePos, Pos, Span, Symbol, kw, sym};
+use rustc_span::{BytePos, InnerSpan, Pos, Span, Symbol, kw, sym};
 
 /// Like [std::fmt::Arguments] this is a string that has been parsed into "pieces",
 /// either as string pieces or dynamic arguments.
@@ -160,22 +160,23 @@ impl FormatString {
 
     pub fn parse<'tcx>(
         input: Symbol,
+        snippet: Option<String>,
         span: Span,
         ctx: &Ctx<'tcx>,
     ) -> Result<Self, Vec<ParseError>> {
         let s = input.as_str();
-        let mut parser = Parser::new(s, None, None, false, ParseMode::Format);
+        let mut parser = Parser::new(s, None, snippet, false, ParseMode::Format).into_iter();
         let mut pieces = Vec::new();
         let mut warnings = Vec::new();
 
-        for piece in &mut parser {
+        while let Some(piece) = parser.next() {
             match piece {
                 RpfPiece::Lit(lit) => {
                     pieces.push(Piece::Lit(lit.into()));
                 }
                 RpfPiece::NextArgument(arg) => {
-                    warn_on_format_spec(arg.format.clone(), &mut warnings, span);
-                    let arg = parse_arg(&arg, ctx, &mut warnings, span);
+                    warn_on_format_spec(arg.format.clone(), &mut warnings, span, &parser);
+                    let arg = parse_arg(&arg, ctx, &mut warnings, span, &parser);
                     pieces.push(Piece::Arg(arg));
                 }
             }
@@ -229,12 +230,18 @@ fn parse_arg<'tcx>(
     ctx: &Ctx<'tcx>,
     warnings: &mut Vec<FormatWarning>,
     input_span: Span,
+    parser: &Parser<'_>,
 ) -> FormatArg {
     let (Ctx::RustcOnUnimplemented { tcx, trait_def_id }
     | Ctx::DiagnosticOnUnimplemented { tcx, trait_def_id }) = ctx;
     let trait_name = tcx.item_ident(*trait_def_id);
     let generics = tcx.generics_of(trait_def_id);
-    let span = slice_span(input_span, arg.position_span.clone());
+
+    let span = if parser.is_source_literal {
+        slice_span(input_span, parser.cur_line_start - 1, arg.position_span.clone())
+    } else {
+        input_span
+    };
 
     match arg.position {
         // Something like "hello {name}"
@@ -312,7 +319,12 @@ fn parse_arg<'tcx>(
 
 /// `#[rustc_on_unimplemented]` and `#[diagnostic::...]` don't actually do anything
 /// with specifiers, so emit a warning if they are used.
-fn warn_on_format_spec(spec: FormatSpec<'_>, warnings: &mut Vec<FormatWarning>, input_span: Span) {
+fn warn_on_format_spec(
+    spec: FormatSpec<'_>,
+    warnings: &mut Vec<FormatWarning>,
+    fmt_span: Span,
+    parser: &Parser<'_>,
+) {
     if !matches!(
         spec,
         FormatSpec {
@@ -327,21 +339,28 @@ fn warn_on_format_spec(spec: FormatSpec<'_>, warnings: &mut Vec<FormatWarning>, 
             precision_span: None,
             width: Count::CountImplied,
             width_span: None,
-            ty: _,
+            ty: "",
             ty_span: _,
         },
     ) {
-        let span = spec.ty_span.map(|inner| slice_span(input_span, inner)).unwrap_or(input_span);
+        let span = if let Some(arg_span) = parser.arg_places.last()
+            && parser.is_source_literal
+        {
+            let offset = parser.cur_line_start - 1;
+            fmt_span.from_inner(InnerSpan::new(arg_span.start + offset, arg_span.end + offset))
+        } else {
+            fmt_span
+        };
         warnings.push(FormatWarning::InvalidSpecifier { span, name: spec.ty.into() })
     }
 }
 
-fn slice_span(input: Span, range: Range<usize>) -> Span {
+fn slice_span(input: Span, offset: usize, range: Range<usize>) -> Span {
     let span = input.data();
 
     Span::new(
-        span.lo + BytePos::from_usize(range.start),
-        span.lo + BytePos::from_usize(range.end),
+        span.lo + BytePos::from_usize(offset + range.start),
+        span.lo + BytePos::from_usize(offset + range.end),
         span.ctxt,
         span.parent,
     )

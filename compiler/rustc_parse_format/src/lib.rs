@@ -178,6 +178,7 @@ pub enum Count<'a> {
     CountImplied,
 }
 
+#[derive(Debug)]
 pub struct ParseError {
     pub description: String,
     pub note: Option<String>,
@@ -187,6 +188,7 @@ pub struct ParseError {
     pub suggestion: Suggestion,
 }
 
+#[derive(Debug)]
 pub enum Suggestion {
     None,
     /// Replace inline argument with positional argument:
@@ -208,6 +210,7 @@ pub enum Suggestion {
 ///
 /// This is a recursive-descent parser for the sake of simplicity, and if
 /// necessary there's probably lots of room for improvement performance-wise.
+#[derive(Debug)]
 pub struct Parser<'a> {
     mode: ParseMode,
     /// Input to be parsed
@@ -231,7 +234,7 @@ pub struct Parser<'a> {
     /// Index to the end of the literal snippet
     end_of_snippet: usize,
     /// Start position of the current line.
-    cur_line_start: usize,
+    pub cur_line_start: usize,
     /// Start and end byte offset of every line of the format string. Excludes
     /// newline characters and leading whitespace.
     pub line_spans: Vec<Range<usize>>,
