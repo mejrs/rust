@@ -677,12 +677,11 @@ fn expand_preparsed_asm(
             continue;
         }
 
-        let mut parser = parse::Parser::new(
+        let mut parser = parse::Parser::<parse::InlineAsm>::new(
             template_str,
             str_style,
             template_snippet,
             false,
-            parse::ParseMode::InlineAsm,
         );
         parser.curarg = curarg;
 
@@ -802,12 +801,12 @@ fn expand_preparsed_asm(
                         }
                     };
 
-                    let mut chars = arg.format.ty.chars();
+                    let mut chars = arg.format.modifier.chars();
                     let mut modifier = chars.next();
                     if chars.next().is_some() {
                         let span = arg
                             .format
-                            .ty_span
+                            .offset
                             .map(|sp| template_sp.from_inner(InnerSpan::new(sp.start, sp.end)))
                             .unwrap_or(template_sp);
                         ecx.dcx().emit_err(errors::AsmModifierInvalid { span });

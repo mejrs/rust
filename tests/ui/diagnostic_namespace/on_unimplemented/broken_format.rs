@@ -20,10 +20,8 @@ trait ImportantTrait3 {}
 trait ImportantTrait4 {}
 
 #[diagnostic::on_unimplemented(message = "Test {Self:!}")]
-//~^WARN expected `}`, found `!`
-//~|WARN expected `}`, found `!`
-//~|WARN unmatched `}` found
-//~|WARN unmatched `}` found
+//~^WARN invalid format specifier [unknown_or_malformed_diagnostic_attributes]
+//~|WARN invalid format specifier [unknown_or_malformed_diagnostic_attributes]
 trait ImportantTrait5 {}
 
 fn check_1(_: impl ImportantTrait1) {}
@@ -42,5 +40,5 @@ fn main() {
     check_4(());
     //~^ERROR Test ()
     check_5(());
-    //~^ERROR Test {Self:!}
+    //~^ERROR Test ()
 }

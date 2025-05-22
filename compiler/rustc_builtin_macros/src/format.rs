@@ -248,13 +248,8 @@ fn make_format_args(
 
     let fmt_str = fmt_str.as_str(); // for the suggestions below
     let fmt_snippet = ecx.source_map().span_to_snippet(unexpanded_fmt_span).ok();
-    let mut parser = parse::Parser::new(
-        fmt_str,
-        str_style,
-        fmt_snippet,
-        append_newline,
-        parse::ParseMode::Format,
-    );
+    let mut parser =
+        parse::Parser::<parse::Format>::new(fmt_str, str_style, fmt_snippet, append_newline);
 
     let mut pieces = Vec::new();
     while let Some(piece) = parser.next() {
@@ -642,7 +637,7 @@ fn report_missing_placeholders(
     unused: Vec<(Span, bool)>,
     used: &[bool],
     args: &FormatArguments,
-    pieces: &[parse::Piece<'_>],
+    pieces: &[parse::Piece<'_, parse::FormatSpec<'_>>],
     detect_foreign_fmt: bool,
     str_style: Option<usize>,
     fmt_str: &str,
@@ -843,7 +838,7 @@ fn report_invalid_references(
     template: &[FormatArgsPiece],
     fmt_span: Span,
     args: &FormatArguments,
-    parser: parse::Parser<'_>,
+    parser: parse::Parser<'_, parse::Format>,
 ) {
     let num_args_desc = match args.explicit_args().len() {
         0 => "no arguments were given".to_string(),

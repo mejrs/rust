@@ -1,13 +1,11 @@
+use std::convert::Infallible;
 use std::fmt;
 use std::ops::Range;
 
 use errors::*;
 use rustc_middle::ty::TyCtxt;
 use rustc_middle::ty::print::TraitRefPrintSugared;
-use rustc_parse_format::{
-    Alignment, Argument, Count, FormatSpec, ParseError, ParseMode, Parser, Piece as RpfPiece,
-    Position,
-};
+use rustc_parse_format::{Argument, Diagnostic, ParseError, Parser, Piece as RpfPiece, Position};
 use rustc_session::lint::builtin::UNKNOWN_OR_MALFORMED_DIAGNOSTIC_ATTRIBUTES;
 use rustc_span::def_id::DefId;
 use rustc_span::{BytePos, Pos, Span, Symbol, kw, sym};
@@ -164,7 +162,7 @@ impl FormatString {
         ctx: &Ctx<'tcx>,
     ) -> Result<Self, Vec<ParseError>> {
         let s = input.as_str();
-        let mut parser = Parser::new(s, None, None, false, ParseMode::Format);
+        let mut parser = Parser::<Diagnostic>::new(s, None, None, false);
         let mut pieces = Vec::new();
         let mut warnings = Vec::new();
 
@@ -174,17 +172,27 @@ impl FormatString {
                     pieces.push(Piece::Lit(lit.into()));
                 }
                 RpfPiece::NextArgument(arg) => {
-                    warn_on_format_spec(arg.format.clone(), &mut warnings, span);
                     let arg = parse_arg(&arg, ctx, &mut warnings, span);
                     pieces.push(Piece::Arg(arg));
                 }
             }
         }
+        let mut errors = parser.errors;
+        errors
+            .extract_if(.., |ParseError { description, .. }| {
+                description == "expected no format specifier`"
+            })
+            .for_each(|ParseError { span: inner, label, .. }| {
+                warnings.push(FormatWarning::InvalidSpecifier {
+                    span: slice_span(span, inner),
+                    name: label,
+                })
+            });
 
-        if parser.errors.is_empty() {
+        if errors.is_empty() {
             Ok(FormatString { input, pieces, span, warnings })
         } else {
-            Err(parser.errors)
+            Err(errors)
         }
     }
 
@@ -225,7 +233,7 @@ impl FormatString {
 }
 
 fn parse_arg<'tcx>(
-    arg: &Argument<'_>,
+    arg: &Argument<'_, Option<Infallible>>,
     ctx: &Ctx<'tcx>,
     warnings: &mut Vec<FormatWarning>,
     input_span: Span,
@@ -307,32 +315,6 @@ fn parse_arg<'tcx>(
             });
             FormatArg::AsIs(String::from("{}"))
         }
-    }
-}
-
-/// `#[rustc_on_unimplemented]` and `#[diagnostic::...]` don't actually do anything
-/// with specifiers, so emit a warning if they are used.
-fn warn_on_format_spec(spec: FormatSpec<'_>, warnings: &mut Vec<FormatWarning>, input_span: Span) {
-    if !matches!(
-        spec,
-        FormatSpec {
-            fill: None,
-            fill_span: None,
-            align: Alignment::AlignUnknown,
-            sign: None,
-            alternate: false,
-            zero_pad: false,
-            debug_hex: None,
-            precision: Count::CountImplied,
-            precision_span: None,
-            width: Count::CountImplied,
-            width_span: None,
-            ty: _,
-            ty_span: _,
-        },
-    ) {
-        let span = spec.ty_span.map(|inner| slice_span(input_span, inner)).unwrap_or(input_span);
-        warnings.push(FormatWarning::InvalidSpecifier { span, name: spec.ty.into() })
     }
 }
 

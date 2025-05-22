@@ -3,9 +3,9 @@ use Piece::*;
 use super::*;
 
 #[track_caller]
-fn same(fmt: &'static str, p: &[Piece<'static>]) {
-    let parser = Parser::new(fmt, None, None, false, ParseMode::Format);
-    assert_eq!(parser.collect::<Vec<Piece<'static>>>(), p);
+fn same(fmt: &'static str, p: &[Piece<'static, FormatSpec<'_>>]) {
+    let parser = Parser::<Format>::new(fmt, None, None, false);
+    assert_eq!(parser.collect::<Vec<Piece<'static, _>>>(), p);
 }
 
 fn fmtdflt() -> FormatSpec<'static> {
@@ -27,7 +27,7 @@ fn fmtdflt() -> FormatSpec<'static> {
 }
 
 fn musterr(s: &str) {
-    let mut p = Parser::new(s, None, None, false, ParseMode::Format);
+    let mut p = Parser::<Format>::new(s, None, None, false);
     p.next();
     assert!(!p.errors.is_empty());
 }
@@ -92,9 +92,9 @@ fn format_empty() {
 fn format_tab_empty() {
     let fmt_pre = r###""\t{}""###;
     let fmt = "\t{}";
-    let parser = Parser::new(fmt, None, Some(fmt_pre.into()), false, ParseMode::Format);
+    let parser = Parser::<Format>::new(fmt, None, Some(fmt_pre.into()), false);
     assert_eq!(
-        parser.collect::<Vec<Piece<'static>>>(),
+        parser.collect::<Vec<Piece<'static, _>>>(),
         &[
             Lit("\t"),
             NextArgument(Box::new(Argument {
@@ -109,8 +109,8 @@ fn format_tab_empty() {
 fn format_open_brace_tab() {
     let fmt_pre = r###""{\t""###;
     let fmt = "{\t";
-    let mut parser = Parser::new(fmt, None, Some(fmt_pre.into()), false, ParseMode::Format);
-    let _ = parser.by_ref().collect::<Vec<Piece<'static>>>();
+    let mut parser = Parser::<Format>::new(fmt, None, Some(fmt_pre.into()), false);
+    let _ = parser.by_ref().collect::<Vec<Piece<'static, _>>>();
     assert_eq!(parser.errors[0].span, 4..4);
 }
 #[test]
@@ -170,7 +170,7 @@ fn format_raw() {
     let snippet = r###"r#"assertion `left {op} right` failed"#"###.into();
     let source = r#"assertion `left {op} right` failed"#;
 
-    let parser = Parser::new(source, Some(1), Some(snippet), true, ParseMode::Format);
+    let parser = Parser::<Format>::new(source, Some(1), Some(snippet), true);
     let expected = &[
         Lit("assertion `left "),
         NextArgument(Box::new(Argument {
@@ -180,7 +180,7 @@ fn format_raw() {
         })),
         Lit(" right` failed"),
     ];
-    assert_eq!(parser.collect::<Vec<Piece<'static>>>(), expected);
+    assert_eq!(parser.collect::<Vec<Piece<'static, _>>>(), expected);
 }
 #[test]
 fn format_type() {
@@ -536,10 +536,10 @@ fn asm_linespans() {
     let asm = r"
         .intel_syntax noprefix
         nop";
-    let mut parser = Parser::new(asm, Some(0), Some(asm_pre.into()), false, ParseMode::InlineAsm);
+    let mut parser = Parser::<InlineAsm>::new(asm, Some(0), Some(asm_pre.into()), false);
     assert!(parser.is_source_literal);
     assert_eq!(
-        parser.by_ref().collect::<Vec<Piece<'static>>>(),
+        parser.by_ref().collect::<Vec<Piece<'static, _>>>(),
         &[Lit("\n        .intel_syntax noprefix\n        nop")]
     );
     assert_eq!(parser.line_spans, &[2..2, 11..33, 42..45]);
@@ -548,8 +548,8 @@ fn asm_linespans() {
 fn asm_concat() {
     let asm_pre = r###"concat!("invalid", "_", "instruction")"###;
     let asm = "invalid_instruction";
-    let mut parser = Parser::new(asm, None, Some(asm_pre.into()), false, ParseMode::InlineAsm);
+    let mut parser = Parser::<InlineAsm>::new(asm, None, Some(asm_pre.into()), false);
     assert!(!parser.is_source_literal);
-    assert_eq!(parser.by_ref().collect::<Vec<Piece<'static>>>(), &[Lit(asm)]);
+    assert_eq!(parser.by_ref().collect::<Vec<Piece<'static, _>>>(), &[Lit(asm)]);
     assert_eq!(parser.line_spans, &[]);
 }

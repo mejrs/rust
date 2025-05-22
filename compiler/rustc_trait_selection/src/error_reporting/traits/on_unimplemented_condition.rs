@@ -1,5 +1,5 @@
 use rustc_ast::{MetaItemInner, MetaItemKind, MetaItemLit};
-use rustc_parse_format::{ParseMode, Parser, Piece, Position};
+use rustc_parse_format::{Diagnostic, Parser, Piece, Position};
 use rustc_span::{DesugaringKind, Ident, Span, Symbol, kw, sym};
 
 use crate::errors::InvalidOnClause;
@@ -193,7 +193,7 @@ enum LitOrArg {
 
 impl FilterFormatString {
     fn parse(input: Symbol) -> Self {
-        let pieces = Parser::new(input.as_str(), None, None, false, ParseMode::Format)
+        let pieces = Parser::<Diagnostic>::new(input.as_str(), None, None, false)
             .map(|p| match p {
                 Piece::Lit(s) => LitOrArg::Lit(s.to_owned()),
                 // We just ignore formatspecs here

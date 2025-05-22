@@ -3,7 +3,7 @@ use rustc_errors::Applicability;
 use rustc_hir::{self as hir, LangItem};
 use rustc_infer::infer::TyCtxtInferExt;
 use rustc_middle::{bug, ty};
-use rustc_parse_format::{ParseMode, Parser, Piece};
+use rustc_parse_format::{Format, Parser, Piece};
 use rustc_session::lint::FutureIncompatibilityReason;
 use rustc_session::{declare_lint, declare_lint_pass};
 use rustc_span::edition::Edition;
@@ -245,7 +245,7 @@ fn check_panic_str<'tcx>(
         Err(_) => (None, None),
     };
 
-    let mut fmt_parser = Parser::new(fmt, style, snippet.clone(), false, ParseMode::Format);
+    let mut fmt_parser = Parser::<Format>::new(fmt, style, snippet.clone(), false);
     let n_arguments = (&mut fmt_parser).filter(|a| matches!(a, Piece::NextArgument(_))).count();
 
     if n_arguments > 0 && fmt_parser.errors.is_empty() {
