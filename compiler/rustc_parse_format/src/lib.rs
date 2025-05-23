@@ -33,6 +33,41 @@ pub trait ParseMode: Sized + Debug {
     type Err;
 
     fn parse_modifier<'input>(this: &mut Parser<'input, Self>) -> Self::Ret<'input>;
+
+    fn close_brace<'input>(
+        this: &mut Parser<'input, Self>,
+        _arg: &Argument<'input, Self::Ret<'input>>,
+    ) -> Option<Range<usize>> {
+        let (range, description) = if let Some((r, _, c)) = this.input_vec.get(this.input_vec_index)
+        {
+            if *c == '}' {
+                this.input_vec_index += 1;
+                return Some(r.clone());
+            }
+            // or r.clone()?
+            (r.start..r.start, format!("expected `}}`, found `{}`", c.escape_debug()))
+        } else {
+            (
+                // point at closing `"`
+                this.end_of_snippet..this.end_of_snippet,
+                "expected `}` but string was terminated".to_owned(),
+            )
+        };
+
+        this.errors.push(ParseError {
+            description,
+            note: Some("if you intended to print `{`, you can escape it using `{{`".to_owned()),
+            label: "expected `}`".to_owned(),
+            span: range.start..range.start,
+            secondary_label: this
+                .last_open_brace
+                .clone()
+                .map(|sp| ("because of this opening brace".to_owned(), sp)),
+            suggestion: Suggestion::None,
+        });
+
+        None
+    }
 }
 
 /// A piece is a portion of the format string which represents the next part
@@ -140,18 +175,14 @@ impl<'input, M: ParseMode> Iterator for Parser<'input, M> {
                         // single open brace
                         self.last_open_brace = Some(start..end);
                         let arg = self.argument();
+                        this.ws();
 
-                        if let Some(close_brace_range) = self.consume_closing_brace(&arg) {
-                            if self.is_source_literal {
-                                self.arg_places.push(start..close_brace_range.end);
-                            }
-                        } else if let Some(&(_, _, c)) = self.input_vec.get(self.input_vec_index) {
-                            match c {
-                                '?' => self.suggest_format_debug(),
-                                '<' | '^' | '>' => self.suggest_format_align(c),
-                                _ => self.suggest_positional_arg_instead_of_captured_arg(&arg),
-                            }
+                        if let Some(close_brace_range) = M::close_brace(self, &arg)
+                            && self.is_source_literal
+                        {
+                            self.arg_places.push(start..close_brace_range.end);
                         }
+
                         Some(Piece::NextArgument(Box::new(arg)))
                     }
                 }
@@ -308,63 +339,6 @@ impl<'input, M: ParseMode> Parser<'input, M> {
                 return Some((r.clone(), *i));
             }
         }
-        None
-    }
-
-    /// Forces consumption of the specified character. If the character is not
-    /// found, an error is emitted.
-    fn consume_closing_brace(
-        &mut self,
-        arg: &Argument<'_, M::Ret<'input>>,
-    ) -> Option<Range<usize>> {
-        self.ws();
-        let _ = arg;
-
-        let (range, description) = if let Some((r, _, c)) = self.input_vec.get(self.input_vec_index)
-        {
-            if *c == '}' {
-                self.input_vec_index += 1;
-                return Some(r.clone());
-            }
-            // or r.clone()?
-            (r.start..r.start, format!("expected `}}`, found `{}`", c.escape_debug()))
-        } else {
-            (
-                // point at closing `"`
-                self.end_of_snippet..self.end_of_snippet,
-                "expected `}` but string was terminated".to_owned(),
-            )
-        };
-        /*
-
-        let (note, secondary_label) = if arg.format.fill == Some('}') {
-            (
-                Some("the character `}` is interpreted as a fill character because of the `:` that precedes it".to_owned()),
-                arg.format.fill_span.clone().map(|sp| ("this is not interpreted as a formatting closing brace".to_owned(), sp)),
-            )
-        } else {
-            (
-                Some("if you intended to print `{`, you can escape it using `{{`".to_owned()),
-                self.last_open_brace
-                    .clone()
-                    .map(|sp| ("because of this opening brace".to_owned(), sp)),
-            )
-        };
-                */
-
-        let (note, secondary_label) = (
-            Some("if you intended to print `{`, you can escape it using `{{`".to_owned()),
-            self.last_open_brace.clone().map(|sp| ("because of this opening brace".to_owned(), sp)),
-        );
-        self.errors.push(ParseError {
-            description,
-            note,
-            label: "expected `}`".to_owned(),
-            span: range.start..range.start,
-            secondary_label,
-            suggestion: Suggestion::None,
-        });
-
         None
     }
 
@@ -584,89 +558,6 @@ impl<'input, M: ParseMode> Parser<'input, M> {
         }
 
         found.then_some(cur)
-    }
-
-    fn suggest_format_debug(&mut self) {
-        if let (Some((range, _)), Some(_)) = (self.consume_pos('?'), self.consume_pos(':')) {
-            let word = self.word();
-            self.errors.insert(
-                0,
-                ParseError {
-                    description: "expected format parameter to occur after `:`".to_owned(),
-                    note: Some(format!("`?` comes after `:`, try `{}:{}` instead", word, "?")),
-                    label: "expected `?` to occur after `:`".to_owned(),
-                    span: range,
-                    secondary_label: None,
-                    suggestion: Suggestion::None,
-                },
-            );
-        }
-    }
-
-    fn suggest_format_align(&mut self, alignment: char) {
-        if let Some((range, _)) = self.consume_pos(alignment) {
-            self.errors.insert(
-                0,
-                ParseError {
-                    description: "expected format parameter to occur after `:`".to_owned(),
-                    note: None,
-                    label: format!("expected `{}` to occur after `:`", alignment),
-                    span: range,
-                    secondary_label: None,
-                    suggestion: Suggestion::None,
-                },
-            );
-        }
-    }
-
-    fn suggest_positional_arg_instead_of_captured_arg(
-        &mut self,
-        arg: &Argument<'input, M::Ret<'input>>,
-    ) {
-        // If the argument is not an identifier, it is not a field access.
-        if !arg.is_identifier() {
-            return;
-        }
-
-        if let Some((_range, _pos)) = self.consume_pos('.') {
-            let field = self.argument();
-            // We can only parse simple `foo.bar` field access or `foo.0` tuple index access, any
-            // deeper nesting, or another type of expression, like method calls, are not supported
-            if !self.consume('}') {
-                return;
-            }
-            if let ArgumentNamed(_) = arg.position {
-                match field.position {
-                    ArgumentNamed(_) => {
-                        self.errors.insert(
-                            0,
-                            ParseError {
-                                description: "field access isn't supported".to_string(),
-                                note: None,
-                                label: "not supported".to_string(),
-                                span: arg.position_span.start..field.position_span.end,
-                                secondary_label: None,
-                                suggestion: Suggestion::UsePositional,
-                            },
-                        );
-                    }
-                    ArgumentIs(_) => {
-                        self.errors.insert(
-                            0,
-                            ParseError {
-                                description: "tuple index access isn't supported".to_string(),
-                                note: None,
-                                label: "not supported".to_string(),
-                                span: arg.position_span.start..field.position_span.end,
-                                secondary_label: None,
-                                suggestion: Suggestion::UsePositional,
-                            },
-                        );
-                    }
-                    _ => {}
-                };
-            }
-        }
     }
 }
 
