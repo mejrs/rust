@@ -2,7 +2,6 @@
 //@ normalize-stderr-test: "\b2500(060|120)\b" -> "250$$PTR"
 #![allow(unused, incomplete_features)]
 #![warn(clippy::large_stack_frames)]
-#![feature(unsized_locals)]
 
 use std::hint::black_box;
 

@@ -1,6 +1,3 @@
-#![feature(unsized_locals)]
-#![allow(incomplete_features)]
-
 fn main() {
     pub trait Foo {
         fn foo(self) -> String;
