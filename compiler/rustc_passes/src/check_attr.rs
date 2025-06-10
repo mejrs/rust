@@ -117,6 +117,7 @@ impl<'tcx> CheckAttrVisitor<'tcx> {
         let attrs = self.tcx.hir_attrs(hir_id);
         for attr in attrs {
             match attr {
+                Attribute::Parsed(AttributeKind::Blah) => {},
                 Attribute::Parsed(AttributeKind::Confusables { first_span, .. }) => {
                     self.check_confusables(*first_span, target);
                 }

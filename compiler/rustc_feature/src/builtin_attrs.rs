@@ -820,6 +820,12 @@ pub static BUILTIN_ATTRIBUTES: &[BuiltinAttribute] = &[
         ErrorFollowing, EncodeCrossCrate::Yes,
         INTERNAL_UNSTABLE,
     ),
+    rustc_attr!(
+        rustc_blah, Normal,
+        template!(Word),
+        ErrorFollowing, EncodeCrossCrate::Yes,
+        INTERNAL_UNSTABLE,
+    ),
     // Enumerates "identity-like" conversion methods to suggest on type mismatch.
     rustc_attr!(
         rustc_conversion_suggestion, Normal, template!(Word),

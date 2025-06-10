@@ -162,6 +162,7 @@ pub enum AttributeKind {
     // tidy-alphabetical-start
     AllowConstFnUnstable(ThinVec<Symbol>),
     AllowInternalUnstable(ThinVec<(Symbol, Span)>),
+    Blah,
     BodyStability {
         stability: DefaultBodyStability,
         /// Span of the `#[rustc_default_body_unstable(...)]` attribute

@@ -15,6 +15,7 @@ use crate::attributes::allow_unstable::{AllowConstFnUnstableParser, AllowInterna
 use crate::attributes::confusables::ConfusablesParser;
 use crate::attributes::deprecation::DeprecationParser;
 use crate::attributes::repr::ReprParser;
+use crate::attributes::blah::BlahParser;
 use crate::attributes::stability::{
     BodyStabilityParser, ConstStabilityIndirectParser, ConstStabilityParser, StabilityParser,
 };
@@ -66,6 +67,7 @@ macro_rules! attribute_groups {
 attribute_groups!(
     pub(crate) static ATTRIBUTE_MAPPING = [
         // tidy-alphabetical-start
+        BlahParser,
         BodyStabilityParser,
         ConfusablesParser,
         ConstStabilityParser,
