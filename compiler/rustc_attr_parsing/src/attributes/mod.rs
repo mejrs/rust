@@ -24,10 +24,10 @@ use crate::context::{AcceptContext, FinalizeContext};
 use crate::parser::ArgParser;
 
 pub(crate) mod allow_unstable;
+pub(crate) mod blah;
 pub(crate) mod cfg;
 pub(crate) mod confusables;
 pub(crate) mod deprecation;
-pub(crate) mod blah;
 pub(crate) mod repr;
 pub(crate) mod stability;
 pub(crate) mod transparency;

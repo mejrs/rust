@@ -1,2 +1,4 @@
-#[rustc_blah(x(y(note = concat!())))]
+#![crate_type = "lib"]
+
+#[blah(x(y(note = concat!())))]
 struct Foo;

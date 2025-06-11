@@ -9,13 +9,16 @@ use crate::context::FinalizeContext;
 use crate::session_diagnostics;
 
 #[derive(Default)]
-pub(crate) struct BlahParser;
+pub(crate) struct BlahParser {
+    found: bool,
+}
 
 impl AttributeParser for BlahParser {
-    const ATTRIBUTES: AcceptMapping<Self> = &[(&[sym::rustc_blah], |this, cx, args| {
+    const ATTRIBUTES: AcceptMapping<Self> = &[(&[sym::blah], |this, cx, args| {
+        this.found = true;
     })];
 
     fn finalize(self, _cx: &FinalizeContext<'_>) -> Option<AttributeKind> {
-        Some(AttributeKind::Blah)
+        if self.found { Some(AttributeKind::Blah) } else { None }
     }
 }

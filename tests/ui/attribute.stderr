@@ -1,0 +1,8 @@
+error: cannot find attribute `blah` in this scope
+  --> $DIR/attribute.rs:3:3
+   |
+LL | #[blah(x(y(note = concat!())))]
+   |   ^^^^
+
+error: aborting due to 1 previous error
+
