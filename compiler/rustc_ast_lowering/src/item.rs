@@ -2,6 +2,7 @@ use rustc_abi::ExternAbi;
 use rustc_ast::ptr::P;
 use rustc_ast::visit::AssocCtxt;
 use rustc_ast::*;
+use rustc_attr_parsing::AttrTarget;
 use rustc_errors::ErrorGuaranteed;
 use rustc_hir::def::{DefKind, PerNS, Res};
 use rustc_hir::def_id::{CRATE_DEF_ID, LocalDefId};
@@ -82,7 +83,7 @@ impl<'a, 'hir> ItemLowerer<'a, 'hir> {
                     self.with_lctx(CRATE_NODE_ID, |lctx| {
                         let module = lctx.lower_mod(&c.items, &c.spans);
                         // FIXME(jdonszelman): is dummy span ever a problem here?
-                        lctx.lower_attrs(hir::CRATE_HIR_ID, &c.attrs, DUMMY_SP);
+                        lctx.lower_attrs(hir::CRATE_HIR_ID, &c.attrs, AttrTarget::Todo, DUMMY_SP);
                         hir::OwnerNode::Crate(module)
                     })
                 }
@@ -138,7 +139,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     fn lower_item(&mut self, i: &Item) -> &'hir hir::Item<'hir> {
         let vis_span = self.lower_span(i.vis.span);
         let hir_id = hir::HirId::make_owner(self.current_hir_id_owner.def_id);
-        let attrs = self.lower_attrs(hir_id, &i.attrs, i.span);
+        let attrs = self.lower_attrs(hir_id, &i.attrs, AttrTarget::from(&i.kind), i.span);
         let kind = self.lower_item_kind(i.span, i.id, hir_id, attrs, vis_span, &i.kind);
         let item = hir::Item {
             owner_id: hir_id.expect_owner(),
@@ -641,7 +642,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     fn lower_foreign_item(&mut self, i: &ForeignItem) -> &'hir hir::ForeignItem<'hir> {
         let hir_id = hir::HirId::make_owner(self.current_hir_id_owner.def_id);
         let owner_id = hir_id.expect_owner();
-        let attrs = self.lower_attrs(hir_id, &i.attrs, i.span);
+        let attrs = self.lower_attrs(hir_id, &i.attrs, AttrTarget::Todo, i.span);
         let (ident, kind) = match &i.kind {
             ForeignItemKind::Fn(box Fn { sig, ident, generics, define_opaque, .. }) => {
                 let fdec = &sig.decl;
@@ -716,7 +717,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
 
     fn lower_variant(&mut self, v: &Variant) -> hir::Variant<'hir> {
         let hir_id = self.lower_node_id(v.id);
-        self.lower_attrs(hir_id, &v.attrs, v.span);
+        self.lower_attrs(hir_id, &v.attrs, AttrTarget::Todo, v.span);
         hir::Variant {
             hir_id,
             def_id: self.local_def_id(v.id),
@@ -778,7 +779,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     ) -> hir::FieldDef<'hir> {
         let ty = self.lower_ty(&f.ty, ImplTraitContext::Disallowed(ImplTraitPosition::FieldTy));
         let hir_id = self.lower_node_id(f.id);
-        self.lower_attrs(hir_id, &f.attrs, f.span);
+        self.lower_attrs(hir_id, &f.attrs, AttrTarget::Todo, f.span);
         hir::FieldDef {
             span: self.lower_span(f.span),
             hir_id,
@@ -797,7 +798,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
 
     fn lower_trait_item(&mut self, i: &AssocItem) -> &'hir hir::TraitItem<'hir> {
         let hir_id = hir::HirId::make_owner(self.current_hir_id_owner.def_id);
-        let attrs = self.lower_attrs(hir_id, &i.attrs, i.span);
+        let attrs = self.lower_attrs(hir_id, &i.attrs, AttrTarget::from((true, &i.kind)), i.span);
         let trait_item_def_id = hir_id.expect_owner();
 
         let (ident, generics, kind, has_default) = match &i.kind {
@@ -991,7 +992,12 @@ impl<'hir> LoweringContext<'_, 'hir> {
         let has_value = true;
         let (defaultness, _) = self.lower_defaultness(i.kind.defaultness(), has_value);
         let hir_id = hir::HirId::make_owner(self.current_hir_id_owner.def_id);
-        let attrs = self.lower_attrs(hir_id, &i.attrs, i.span);
+        let attrs = self.lower_attrs(
+            hir_id,
+            &i.attrs,
+            AttrTarget::from((is_in_trait_impl, &i.kind)),
+            i.span,
+        );
 
         let (ident, (generics, kind)) = match &i.kind {
             AssocItemKind::Const(box ConstItem {
@@ -1185,7 +1191,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
 
     fn lower_param(&mut self, param: &Param) -> hir::Param<'hir> {
         let hir_id = self.lower_node_id(param.id);
-        self.lower_attrs(hir_id, &param.attrs, param.span);
+        self.lower_attrs(hir_id, &param.attrs, AttrTarget::Todo, param.span);
         hir::Param {
             hir_id,
             pat: self.lower_pat(&param.pat),
@@ -1894,7 +1900,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
     fn lower_where_predicate(&mut self, pred: &WherePredicate) -> hir::WherePredicate<'hir> {
         let hir_id = self.lower_node_id(pred.id);
         let span = self.lower_span(pred.span);
-        self.lower_attrs(hir_id, &pred.attrs, span);
+        self.lower_attrs(hir_id, &pred.attrs, AttrTarget::Todo, span);
         let kind = self.arena.alloc(match &pred.kind {
             WherePredicateKind::BoundPredicate(WhereBoundPredicate {
                 bound_generic_params,

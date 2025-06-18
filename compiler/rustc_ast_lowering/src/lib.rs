@@ -42,7 +42,7 @@ use std::sync::Arc;
 
 use rustc_ast::node_id::NodeMap;
 use rustc_ast::{self as ast, *};
-use rustc_attr_parsing::{AttributeParser, OmitDoc};
+use rustc_attr_parsing::{AttrTarget, AttributeParser, OmitDoc};
 use rustc_data_structures::fingerprint::Fingerprint;
 use rustc_data_structures::sorted_map::SortedMap;
 use rustc_data_structures::stable_hasher::{HashStable, StableHasher};
@@ -911,12 +911,14 @@ impl<'a, 'hir> LoweringContext<'a, 'hir> {
         &mut self,
         id: HirId,
         attrs: &[Attribute],
+        target: AttrTarget<'_>,
         target_span: Span,
     ) -> &'hir [hir::Attribute] {
         if attrs.is_empty() {
             &[]
         } else {
-            let lowered_attrs = self.lower_attrs_vec(attrs, self.lower_span(target_span), id);
+            let lowered_attrs =
+                self.lower_attrs_vec(attrs, target, self.lower_span(target_span), id);
 
             assert_eq!(id.owner, self.current_hir_id_owner);
             let ret = self.arena.alloc_from_iter(lowered_attrs);
@@ -939,12 +941,14 @@ impl<'a, 'hir> LoweringContext<'a, 'hir> {
     fn lower_attrs_vec(
         &mut self,
         attrs: &[Attribute],
+        target: AttrTarget<'_>,
         target_span: Span,
         target_hir_id: HirId,
     ) -> Vec<hir::Attribute> {
         let l = self.span_lowerer();
         self.attribute_parser.parse_attribute_list(
             attrs,
+            target,
             target_span,
             target_hir_id,
             OmitDoc::Lower,
@@ -1899,7 +1903,7 @@ impl<'a, 'hir> LoweringContext<'a, 'hir> {
         let (name, kind) = self.lower_generic_param_kind(param, source);
 
         let hir_id = self.lower_node_id(param.id);
-        self.lower_attrs(hir_id, &param.attrs, param.span());
+        self.lower_attrs(hir_id, &param.attrs, AttrTarget::Todo, param.span());
         hir::GenericParam {
             hir_id,
             def_id: self.local_def_id(param.id),

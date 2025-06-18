@@ -1,6 +1,6 @@
 use rustc_abi::ExternAbi;
 use rustc_attr_data_structures::{AttributeKind, ReprAttr};
-use rustc_attr_parsing::AttributeParser;
+use rustc_attr_parsing::{AttrTarget, AttributeParser};
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::intravisit::FnKind;
 use rustc_hir::{AttrArgs, AttrItem, Attribute, GenericParamKind, PatExprKind, PatKind};
@@ -164,7 +164,7 @@ impl NonCamelCaseTypes {
 impl EarlyLintPass for NonCamelCaseTypes {
     fn check_item(&mut self, cx: &EarlyContext<'_>, it: &ast::Item) {
         let has_repr_c = matches!(
-            AttributeParser::parse_limited(cx.sess(), &it.attrs, sym::repr, it.span, it.id),
+            AttributeParser::parse_limited(cx.sess(), &it.attrs,  sym::repr, AttrTarget::Todo, it.span, it.id),
             Some(Attribute::Parsed(AttributeKind::Repr(r))) if r.iter().any(|(r, _)| r == &ReprAttr::ReprC)
         );
 

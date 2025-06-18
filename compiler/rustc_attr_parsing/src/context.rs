@@ -15,6 +15,7 @@ use rustc_hir::{AttrArgs, AttrItem, AttrPath, Attribute, HashIgnoredAttrId, HirI
 use rustc_session::Session;
 use rustc_span::{DUMMY_SP, ErrorGuaranteed, Span, Symbol, sym};
 
+use crate::AttrTarget;
 use crate::attributes::allow_unstable::{AllowConstFnUnstableParser, AllowInternalUnstableParser};
 use crate::attributes::confusables::ConfusablesParser;
 use crate::attributes::deprecation::DeprecationParser;
@@ -200,6 +201,8 @@ pub(crate) struct FinalizeContext<'p, 'sess, S: Stage> {
     /// The parse context, gives access to the session and the
     /// diagnostics context.
     pub(crate) cx: &'p mut AttributeParser<'sess, S>,
+    #[allow(dead_code)]
+    pub(crate) target: AttrTarget<'p>,
     /// The span of the syntactical component this attribute was applied to
     pub(crate) target_span: Span,
     /// The id ([`NodeId`] if `S` is `Early`, [`HirId`] if `S` is `Late`) of the syntactical component this attribute was applied to
@@ -262,6 +265,7 @@ impl<'sess> AttributeParser<'sess, Early> {
         sess: &'sess Session,
         attrs: &[ast::Attribute],
         sym: Symbol,
+        target: AttrTarget<'_>,
         target_span: Span,
         target_node_id: NodeId,
     ) -> Option<Attribute> {
@@ -274,6 +278,7 @@ impl<'sess> AttributeParser<'sess, Early> {
         };
         let mut parsed = p.parse_attribute_list(
             attrs,
+            target,
             target_span,
             target_node_id,
             OmitDoc::Skip,
@@ -318,10 +323,10 @@ impl<'sess, S: Stage> AttributeParser<'sess, S> {
     pub fn parse_attribute_list(
         &mut self,
         attrs: &[ast::Attribute],
+        target: AttrTarget<'_>,
         target_span: Span,
         target_id: S::Id,
         omit_doc: OmitDoc,
-
         lower_span: impl Copy + Fn(Span) -> Span,
         mut emit_lint: impl FnMut(AttributeLint<S::Id>),
     ) -> Vec<Attribute> {
@@ -378,6 +383,7 @@ impl<'sess, S: Stage> AttributeParser<'sess, S> {
                         let mut cx: AcceptContext<'_, 'sess, S> = AcceptContext {
                             finalize_cx: FinalizeContext {
                                 cx: self,
+                                target,
                                 target_span,
                                 target_id,
                                 emit_lint: &mut emit_lint,
@@ -418,6 +424,7 @@ impl<'sess, S: Stage> AttributeParser<'sess, S> {
         for f in &S::parsers().1 {
             if let Some(attr) = f(&mut FinalizeContext {
                 cx: self,
+                target,
                 target_span,
                 target_id,
                 emit_lint: &mut emit_lint,
