@@ -1,3 +1,5 @@
+use std::fmt;
+
 use rustc_ast::attr::{AttributeExt, first_attr_value_str_by_name};
 use rustc_attr_data_structures::RustcVersion;
 use rustc_feature::is_builtin_attr_name;
@@ -55,4 +57,26 @@ pub fn is_doc_alias_attrs_contain_symbol<'tcx, T: AttributeExt + 'tcx>(
         }
     }
     false
+}
+
+pub(crate) struct PathPrinter<'s>(pub &'s [Symbol]);
+
+impl fmt::Display for PathPrinter<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "#[")?;
+        match &self.0 {
+            &[] => {}
+            &[one] => {
+                write!(f, "{one}")?;
+            }
+            &[start @ .., last] => {
+                for segment in start {
+                    write!(f, "{segment}::")?;
+                }
+                write!(f, "{last}")?;
+            }
+        }
+        write!(f, "]")?;
+        Ok(())
+    }
 }

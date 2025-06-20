@@ -9,6 +9,7 @@ use rustc_span::{Span, Symbol, sym};
 
 use super::util::parse_version;
 use super::{AcceptMapping, AttributeOrder, AttributeParser, OnDuplicate, SingleAttributeParser};
+use crate::allowed;
 use crate::context::{AcceptContext, FinalizeContext, Stage};
 use crate::parser::{ArgParser, MetaItemParser};
 use crate::session_diagnostics::{self, UnsupportedLiteralReason};
@@ -120,6 +121,7 @@ impl<S: Stage> SingleAttributeParser<S> for ConstStabilityIndirectParser {
     const PATH: &[Symbol] = &[sym::rustc_const_stable_indirect];
     const ATTRIBUTE_ORDER: AttributeOrder = AttributeOrder::KeepFirst;
     const ON_DUPLICATE: OnDuplicate<S> = OnDuplicate::Ignore;
+    const POSITIONS: &[crate::TargetChecker] = &[allowed!(_)];
 
     fn convert(_cx: &mut AcceptContext<'_, '_, S>, _args: &ArgParser<'_>) -> Option<AttributeKind> {
         Some(AttributeKind::ConstStabilityIndirect)

@@ -1,4 +1,4 @@
-error: rustc_as_ptr must be applied to a function or method (rejected during attr parsing)
+error: `#[rustc_as_ptr]` is not valid at that position. It is only allowed in ["function", "method"]
   --> $DIR/woops.rs:4:1
    |
 LL | #[rustc_as_ptr]

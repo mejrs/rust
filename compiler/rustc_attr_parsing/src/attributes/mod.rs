@@ -21,6 +21,7 @@ use rustc_attr_data_structures::lints::AttributeLintKind;
 use rustc_span::{Span, Symbol};
 use thin_vec::ThinVec;
 
+use crate::TargetChecker;
 use crate::context::{AcceptContext, FinalizeContext, Stage};
 use crate::parser::ArgParser;
 use crate::session_diagnostics::UnusedMultiple;
@@ -87,6 +88,7 @@ pub(crate) trait SingleAttributeParser<S: Stage>: 'static {
     const PATH: &[Symbol];
     const ATTRIBUTE_ORDER: AttributeOrder;
     const ON_DUPLICATE: OnDuplicate<S>;
+    const POSITIONS: &[TargetChecker];
 
     /// Converts a single syntactical attribute to a single semantic attribute, or [`AttributeKind`]
     fn convert(cx: &mut AcceptContext<'_, '_, S>, args: &ArgParser<'_>) -> Option<AttributeKind>;
@@ -106,6 +108,25 @@ impl<T: SingleAttributeParser<S>, S: Stage> Default for Single<T, S> {
 impl<T: SingleAttributeParser<S>, S: Stage> AttributeParser<S> for Single<T, S> {
     const ATTRIBUTES: AcceptMapping<Self, S> =
         &[(T::PATH, |group: &mut Single<T, S>, cx, args| {
+            let mut allowed = false;
+            for checker in T::POSITIONS {
+                for pos in checker.check {
+                    allowed |= pos(cx.target);
+                }
+            }
+
+            if !allowed {
+                let allowed_targets = crate::AttrTarget::allowed(T::POSITIONS);
+                cx.dcx().span_err(
+                    cx.attr_span,
+                    format!(
+                        "`{}` is not valid at that position. It is only allowed in {:?}",
+                        crate::attributes::util::PathPrinter(T::PATH),
+                        allowed_targets,
+                    ),
+                );
+                return;
+            }
             if let Some(pa) = T::convert(cx, args) {
                 match T::ATTRIBUTE_ORDER {
                     // keep the first and report immediately. ignore this attribute
