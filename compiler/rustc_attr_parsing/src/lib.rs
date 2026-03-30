@@ -2,18 +2,18 @@
 //!
 //! ## Architecture
 //! This crate is part of a series of crates and modules that handle attribute processing.
-//! - [rustc_hir::attrs](https://doc.rust-lang.org/nightly/nightly-rustc/rustc_hir/index.html): Defines the data structures that store parsed attributes
-//! - [rustc_attr_parsing](https://doc.rust-lang.org/nightly/nightly-rustc/rustc_attr_parsing/index.html): This crate, handles the parsing of attributes
+//! - [`rustc_hir::attrs`]: Defines the data structures that store parsed attributes
+//! - `rustc_attr_parsing`: This crate, handles the parsing of attributes
 //! - (planned) rustc_attr_validation: Will handle attribute validation, logic currently handled in `rustc_passes`
 //!
 //! The separation between data structures and parsing follows the principle of separation of concerns.
-//! Data structures (`rustc_hir::attrs`) define what attributes look like after parsing.
+//! [`rustc_hir::attrs`] defines what attributes look like after parsing.
 //! This crate (`rustc_attr_parsing`) handles how to convert raw tokens into those structures.
 //! This split allows other parts of the compiler to use the data structures without needing
 //! the parsing logic, making the codebase more modular and maintainable.
 //!
 //! ## Background
-//! Previously, the compiler had a single attribute definition (`ast::Attribute`) with parsing and
+//! Previously, the compiler had a single attribute definition ([`ast::Attribute`]) with parsing and
 //! validation scattered throughout the codebase. This was reorganized for better maintainability
 //! (see [#131229](https://github.com/rust-lang/rust/issues/131229)).
 //!
@@ -75,6 +75,9 @@
 //!
 //! This is equivalent to `#[repr(C, packed)]` and results in a single `AttributeKind::Repr`
 //! containing both `C` and `packed` annotations.
+//!
+//! [`rustc_hir::attrs`]: ../rustc_hir/attrs/index.html
+//! [`ast::Attribute`]: ../rustc_ast/ast/struct.Attribute.html
 
 // tidy-alphabetical-start
 #![feature(decl_macro)]

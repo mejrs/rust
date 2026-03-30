@@ -1,8 +1,7 @@
 //! Data structures for representing parsed attributes in the Rust compiler.
-//! Formerly `rustc_attr_data_structures`.
 //!
 //! For detailed documentation about attribute processing,
-//! see [rustc_attr_parsing](https://doc.rust-lang.org/nightly/nightly-rustc/rustc_attr_parsing/index.html).
+//! see [`rustc_attr_parsing`](../../rustc_attr_parsing/index.html).
 
 pub use data_structures::*;
 pub use encode_cross_crate::EncodeCrossCrate;

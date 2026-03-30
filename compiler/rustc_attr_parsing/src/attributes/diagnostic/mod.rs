@@ -1,3 +1,27 @@
+//! Parsing of diagnostic attributes.
+//!
+//! The structures used in these diagnostic attributes are defined at
+//! [`rustc_hir::attrs::diagnostic`].
+//!
+//! Per [RFC 3368], (syntactically valid) diagnostic attributes can not cause compilation errors.
+//! That means none of these implementations are allowed to emit errors; a lint of the 
+//! `unknown-or-malformed-diagnostic-attributes` lint group must be emitted instead.
+//!
+//! `#[rustc_on_unimplemented]` is a superset of `#[diagnostic::on_unimplemented]`and reuses much of
+//! its code. However it is a permanently unstable attribute and is allowed to error.
+//!
+//! Their api is documented in several places:
+//! - Stable diagnostic attributes are documented in the [reference].
+//! - Unstable diagnostic attributes may be documented in the [unstable book].
+//! - `#[rustc_on_unimplemented]` is documented in the [rustc dev guide].
+//!
+//! 
+//! [`rustc_hir::attrs::diagnostic`]: ../../../rustc_hir/attrs/diagnostic/index.html
+//! [RFC 3368]: <https://github.com/rust-lang/rfcs/blob/master/text/3368-diagnostic-attribute-namespace.md>
+//! [reference]: <https://doc.rust-lang.org/reference/attributes/diagnostics.html>
+//! [rustc dev guide]: <https://rustc-dev-guide.rust-lang.org/diagnostics.html#rustc_on_unimplemented>
+//! [unstable book]: <https://doc.rust-lang.org/nightly/unstable-book/>
+
 use std::ops::Range;
 
 use rustc_errors::E0232;
@@ -25,6 +49,7 @@ pub(crate) mod on_const;
 pub(crate) mod on_move;
 pub(crate) mod on_unimplemented;
 
+/// What kind of diagnostic attribute is being parsed.
 #[derive(Copy, Clone)]
 pub(crate) enum Mode {
     /// `#[rustc_on_unimplemented]`
@@ -37,6 +62,19 @@ pub(crate) enum Mode {
     DiagnosticOnMove,
 }
 
+/// Merges multiple attributes.
+///
+/// For example, you can do something like
+/// ```rust
+/// #[diagnostic::on_unimplemented(message = "message")]
+/// #[diagnostic::on_unimplemented(note = "note")]
+/// pub trait Trait {}
+/// ```
+/// which will act as if you wrote
+/// ```rust
+/// #[diagnostic::on_unimplemented(message = "message", note = "note")]
+/// pub trait Trait {}
+/// ```
 fn merge_directives<S: Stage>(
     cx: &mut AcceptContext<'_, '_, S>,
     first: &mut Option<(Span, Directive)>,
@@ -324,6 +362,7 @@ pub(crate) fn parse_format_string(
     Ok((FormatString { input, pieces, span }, warnings))
 }
 
+/// Parse an argument in a format string, like `"{Self}"`."
 fn parse_arg(
     arg: &Argument<'_>,
     mode: Mode,
@@ -363,6 +402,10 @@ fn parse_arg(
     }
 }
 
+/// Warn when format specifiers are used.
+///
+/// The implementation in `rustc_parse_format` will write any format specifiers used to the
+/// `spec.ty` field, so we can just check that.
 /// `#[rustc_on_unimplemented]` and `#[diagnostic::...]` don't actually do anything
 /// with specifiers, so emit a warning if they are used.
 fn warn_on_format_spec(
@@ -466,7 +509,7 @@ fn parse_filter(input: Symbol) -> FilterFormatString {
             RpfPiece::Lit(s) => LitOrArg::Lit(Symbol::intern(s)),
             // We just ignore formatspecs here
             RpfPiece::NextArgument(a) => match a.position {
-                // In `TypeErrCtxt::on_unimplemented_note` we substitute `"{integral}"` even
+                // In `TypeErrCtxt::on_unimplemented_components` we substitute `"{integral}"` even
                 // if the integer type has been resolved, to allow targeting all integers.
                 // `"{integer}"` and `"{float}"` come from numerics that haven't been inferred yet,
                 // from the `Display` impl of `InferTy` to be precise.

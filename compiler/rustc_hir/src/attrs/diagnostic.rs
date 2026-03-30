@@ -1,8 +1,12 @@
-//! Contains the data structures used by the diagnostic attribute family.
+//! Data structures used by the diagnostic attribute family.
+//!
+//! These structures are used by all of `#[diagnostic::_]` and `#[rustc_on_unimplemented]`.
+//! The parsing happens in [`rustc_attr_parsing::attributes::diagnostic`].
+//!
+//! [`rustc_attr_parsing::attributes::diagnostic`]: ../../../rustc_attr_parsing/attributes/diagnostic/index.html
 use std::fmt;
 use std::fmt::Debug;
 
-pub use rustc_ast::attr::data_structures::*;
 use rustc_macros::{Decodable, Encodable, HashStable_Generic, PrintAttribute};
 use rustc_span::{DesugaringKind, Span, Symbol, kw};
 use thin_vec::ThinVec;
@@ -10,6 +14,10 @@ use tracing::{debug, info};
 
 use crate::attrs::PrintAttribute;
 
+/// The base structure of a diagnostic attribute.
+///
+/// Note that not all fields are used by all attributes. For example, `condition` is only used by
+/// `#[rustc_on_unimplemented]`.
 #[derive(Clone, Default, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
 pub struct Directive {
     pub is_rustc_attr: bool,
@@ -53,6 +61,7 @@ impl Directive {
         }
     }
 
+    /// Formats the directive into error messages, ready to be displayed to the user.
     pub fn evaluate_directive(
         &self,
         trait_name: impl Debug,
@@ -105,6 +114,7 @@ impl Directive {
     }
 }
 
+/// Error messages to be shown to the user.
 #[derive(Default, Debug)]
 pub struct OnUnimplementedNote {
     pub message: Option<String>,
@@ -124,7 +134,7 @@ pub enum AppendConstMessage {
     Custom(Symbol, Span),
 }
 
-/// Like [std::fmt::Arguments] this is a string that has been parsed into "pieces",
+/// Like [`std::fmt::Arguments`] this is a string that has been parsed into "pieces",
 /// either as string pieces or dynamic arguments.
 #[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
 pub struct FormatString {
@@ -180,11 +190,10 @@ impl FormatString {
     }
 }
 
-/// Arguments to fill a [FormatString] with.
+/// Arguments to fill a [`FormatString`] with.
 ///
 /// For example, given a
 /// ```rust,ignore (just an example)
-///
 /// #[rustc_on_unimplemented(
 ///     on(all(from_desugaring = "QuestionMark"),
 ///         message = "the `?` operator can only be used in {ItemContext} \
@@ -235,15 +244,17 @@ pub enum FormatArg {
         generic_param: Symbol,
         span: Span,
     },
-    // `{Self}`
+    // `{Self}`.
     SelfUpper,
-    /// `{This}` or `{TraitName}`
+    /// `{This}`.
     This,
     /// The sugared form of the trait
     Trait,
     /// what we're in, like a function, method, closure etc.
     ItemContext,
     /// What the user typed, if it doesn't match anything we can use.
+    ///
+    /// Currently this can only be a non-named argument like `"{}"` or `"{1}"`.
     AsIs(Symbol),
 }
 
