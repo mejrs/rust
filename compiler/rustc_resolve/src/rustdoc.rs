@@ -20,6 +20,7 @@ use rustc_span::source_map::SourceMap;
 use rustc_span::{DUMMY_SP, InnerSpan, Span, Symbol, sym};
 use thin_vec::ThinVec;
 use tracing::{debug, trace};
+use rustc_hir::{attrs::AttributeKind, Attribute};
 
 #[cfg(test)]
 mod tests;
@@ -197,14 +198,14 @@ pub fn add_doc_fragment(out: &mut String, frag: &DocFragment) {
     }
 }
 
-pub fn attrs_to_doc_fragments<'a, A: AttributeExt + Clone + 'a>(
-    attrs: impl Iterator<Item = (&'a A, Option<DefId>)>,
+pub (crate)fn ast_attrs_to_doc_fragments<'a>(
+    attrs: impl Iterator<Item = (&'a rustc_ast::Attribute, Option<DefId>)>,
     doc_only: bool,
-) -> (Vec<DocFragment>, ThinVec<A>) {
+) -> (Vec<DocFragment>, ThinVec<rustc_ast::Attribute>) {
     let (min_size, max_size) = attrs.size_hint();
     let size_hint = max_size.unwrap_or(min_size);
     let mut doc_fragments = Vec::with_capacity(size_hint);
-    let mut other_attrs = ThinVec::<A>::with_capacity(if doc_only { 0 } else { size_hint });
+    let mut other_attrs = ThinVec::with_capacity(if doc_only { 0 } else { size_hint });
     for (attr, item_id) in attrs {
         if let Some((doc_str, fragment_kind)) = attr.doc_str_and_fragment_kind() {
             let doc = beautify_doc_string(doc_str, fragment_kind.comment_kind());
@@ -217,6 +218,40 @@ pub fn attrs_to_doc_fragments<'a, A: AttributeExt + Clone + 'a>(
             };
             let fragment =
                 DocFragment { span, doc, kind: fragment_kind, item_id, indent: 0, from_expansion };
+            doc_fragments.push(fragment);
+        } else if !doc_only {
+            other_attrs.push(attr.clone());
+        }
+    }
+
+    doc_fragments.shrink_to_fit();
+    other_attrs.shrink_to_fit();
+
+    unindent_doc_fragments(&mut doc_fragments);
+
+    (doc_fragments, other_attrs)
+}
+
+/// Used by rustdoc and clippy
+pub fn attrs_to_doc_fragments<'a>(
+    attrs: impl Iterator<Item = (&'a rustc_hir::Attribute, Option<DefId>)>,
+    doc_only: bool,
+) -> (Vec<DocFragment>, ThinVec<rustc_hir::Attribute>) {
+    let (min_size, max_size) = attrs.size_hint();
+    let size_hint = max_size.unwrap_or(min_size);
+    let mut doc_fragments = Vec::with_capacity(size_hint);
+    let mut other_attrs = ThinVec::with_capacity(if doc_only { 0 } else { size_hint });
+    for (attr, item_id) in attrs {
+        if let Attribute::Parsed(AttributeKind::DocComment { kind, comment, span:attr_span, .. }) = attr {
+            let doc = beautify_doc_string(*comment, kind.comment_kind());
+            let (span, from_expansion) = match kind {
+                DocFragmentKind::Sugared(_) => (*attr_span, attr_span.from_expansion()),
+                DocFragmentKind::Raw(value_span) => {
+                    (value_span.with_ctxt(attr_span.ctxt()), value_span.from_expansion())
+                }
+            };
+            let fragment =
+                DocFragment { span, doc, kind: *kind, item_id, indent: 0, from_expansion };
             doc_fragments.push(fragment);
         } else if !doc_only {
             other_attrs.push(attr.clone());
@@ -409,9 +444,9 @@ pub fn may_be_doc_link(link_type: LinkType) -> bool {
 
 /// Simplified version of `preprocessed_markdown_links` from rustdoc.
 /// Must return at least the same links as it, but may add some more links on top of that.
-pub(crate) fn attrs_to_preprocessed_links<A: AttributeExt + Clone>(attrs: &[A]) -> Vec<Box<str>> {
+pub(crate) fn attrs_to_preprocessed_links(attrs: &[ast::Attribute]) -> Vec<Box<str>> {
     let (doc_fragments, other_attrs) =
-        attrs_to_doc_fragments(attrs.iter().map(|attr| (attr, None)), false);
+        ast_attrs_to_doc_fragments(attrs.iter().map(|attr| (attr, None)), false);
     let mut doc =
         prepare_to_doc_link_resolution(&doc_fragments).into_values().next().unwrap_or_default();
 
