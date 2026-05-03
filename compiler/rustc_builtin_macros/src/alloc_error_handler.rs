@@ -2,6 +2,7 @@ use rustc_ast::expand::allocator::{ALLOC_ERROR_HANDLER, global_fn_name};
 use rustc_ast::{
     self as ast, Fn, FnHeader, FnSig, Generics, ItemKind, Safety, Stmt, StmtKind, TyKind,
 };
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::{Ident, Span, kw, sym};
 use thin_vec::{ThinVec, thin_vec};
@@ -13,6 +14,7 @@ pub(crate) fn expand(
     ecx: &mut ExtCtxt<'_>,
     _span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     item: Annotatable,
 ) -> Vec<Annotatable> {
     check_builtin_macro_attribute(ecx, meta_item, sym::alloc_error_handler);

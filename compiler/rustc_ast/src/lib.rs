@@ -8,6 +8,7 @@
 #![doc(test(attr(deny(warnings), allow(internal_features))))]
 #![feature(associated_type_defaults)]
 #![feature(box_patterns)]
+#![feature(default_field_values)]
 #![feature(iter_order_by)]
 #![feature(macro_metavar_expr)]
 #![recursion_limit = "256"]
@@ -25,6 +26,7 @@ pub mod util {
 pub mod ast;
 pub mod ast_traits;
 pub mod attr;
+pub mod diagnostic;
 pub mod entry;
 pub mod expand;
 pub mod format;

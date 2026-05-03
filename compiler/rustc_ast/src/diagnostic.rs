@@ -1,23 +1,25 @@
 //! Contains the data structures used by the diagnostic attribute family.
+
 use std::fmt;
 use std::fmt::Debug;
 
-pub use rustc_ast::attr::data_structures::*;
-use rustc_macros::{Decodable, Encodable, HashStable_Generic, PrintAttribute};
+use rustc_macros::{Decodable, Encodable, HashStable_Generic, Walkable};
 use rustc_span::{DesugaringKind, Span, Symbol, kw};
 use thin_vec::ThinVec;
 use tracing::debug;
 
-use crate::attrs::PrintAttribute;
-
-#[derive(Clone, Default, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Default, Debug, HashStable_Generic, Encodable, Decodable, Walkable)]
 pub struct Directive {
     pub is_rustc_attr: bool,
     pub condition: Option<OnUnimplementedCondition>,
     pub subcommands: ThinVec<Directive>,
+    #[visitable(ignore)]
     pub message: Option<(Span, FormatString)>,
+    #[visitable(ignore)]
     pub label: Option<(Span, FormatString)>,
+    #[visitable(ignore)]
     pub notes: ThinVec<FormatString>,
+    #[visitable(ignore)]
     pub parent_label: Option<FormatString>,
 }
 
@@ -123,7 +125,7 @@ pub struct CustomDiagnostic {
 
 /// Like [std::fmt::Arguments] this is a string that has been parsed into "pieces",
 /// either as string pieces or dynamic arguments.
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable)]
 pub struct FormatString {
     pub input: Symbol,
     pub span: Span,
@@ -225,13 +227,13 @@ pub struct FormatArgs {
     pub generic_args: Vec<(Symbol, String)> = Vec::new(),
 }
 
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable)]
 pub enum Piece {
     Lit(Symbol),
     Arg(FormatArg),
 }
 
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable)]
 pub enum FormatArg {
     // A generic parameter, like `{T}` if we're on the `From<T>` trait.
     GenericParam {
@@ -251,7 +253,7 @@ pub enum FormatArg {
 }
 
 /// Represents the `on` filter in `#[rustc_on_unimplemented]`.
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, Walkable)]
 pub struct OnUnimplementedCondition {
     pub span: Span,
     pub pred: Predicate,
@@ -276,12 +278,12 @@ impl OnUnimplementedCondition {
 ///
 /// It is similar to the predicate in the `cfg` attribute,
 /// and may contain nested predicates.
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, Walkable)]
 pub enum Predicate {
     /// A condition like `on(crate_local)`.
-    Flag(Flag),
+    Flag(#[visitable(ignore)] Flag),
     /// A match, like `on(Rhs = "Whatever")`.
-    Match(NameValue),
+    Match(#[visitable(ignore)] NameValue),
     /// Negation, like `on(not($pred))`.
     Not(Box<Predicate>),
     /// True if all predicates are true, like `on(all($a, $b, $c))`.
@@ -314,7 +316,7 @@ impl Predicate {
 }
 
 /// Represents a `MetaWord` in an `on`-filter.
-#[derive(Clone, Copy, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Copy, Debug, HashStable_Generic, Encodable, Decodable)]
 pub enum Flag {
     /// Whether the code causing the trait bound to not be fulfilled
     /// is part of the user's crate.
@@ -329,7 +331,7 @@ pub enum Flag {
 /// A `MetaNameValueStr` in an `on`-filter.
 ///
 /// For example, `#[rustc_on_unimplemented(on(name = "value", message = "hello"))]`.
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable)]
 pub struct NameValue {
     pub name: Name,
     /// Something like `"&str"` or `"alloc::string::String"`,
@@ -348,7 +350,7 @@ impl NameValue {
 }
 
 /// The valid names of the `on` filter.
-#[derive(Clone, Copy, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Copy, Debug, HashStable_Generic, Encodable, Decodable)]
 pub enum Name {
     Cause,
     FromDesugaring,
@@ -368,7 +370,7 @@ pub enum FlagOrNv<'p> {
 /// If it is a simple literal like this then `pieces` will be `[LitOrArg::Lit("value")]`.
 /// The `Arg` variant is used when it contains formatting like
 /// `#[rustc_on_unimplemented(on(Self = "&[{A}]", message = "hello"))]`.
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable)]
 pub struct FilterFormatString {
     pub pieces: ThinVec<LitOrArg>,
 }
@@ -400,7 +402,7 @@ impl FilterFormatString {
     }
 }
 
-#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, PrintAttribute)]
+#[derive(Clone, Debug, HashStable_Generic, Encodable, Decodable, Walkable)]
 pub enum LitOrArg {
     Lit(Symbol),
     Arg(Symbol),

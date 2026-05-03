@@ -1,6 +1,7 @@
 //! Implementation of the `#[cfg_accessible(path)]` attribute macro.
 
 use rustc_ast as ast;
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_attr_parsing::validate_attr;
 use rustc_expand::base::{Annotatable, ExpandResult, ExtCtxt, Indeterminate, MultiItemModifier};
 use rustc_feature::AttributeTemplate;
@@ -41,6 +42,7 @@ impl MultiItemModifier for Expander {
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         meta_item: &ast::MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
         _is_derive_const: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable> {

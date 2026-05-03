@@ -5,6 +5,7 @@ use std::collections::hash_set;
 use std::path::PathBuf;
 
 use rustc_ast::ast::LitKind;
+use rustc_ast::diagnostic::CustomDiagnostic;
 use rustc_ast::{LitIntType, TraitObjectSyntax};
 use rustc_data_structures::fx::{FxHashMap, FxHashSet};
 use rustc_data_structures::unord::UnordSet;
@@ -13,7 +14,6 @@ use rustc_errors::{
     Applicability, Diag, ErrorGuaranteed, Level, MultiSpan, StashKey, StringPart, Suggestions, msg,
     pluralize, struct_span_code_err,
 };
-use rustc_hir::attrs::diagnostic::CustomDiagnostic;
 use rustc_hir::def_id::{DefId, LOCAL_CRATE, LocalDefId};
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::{self as hir, LangItem, Node, find_attr};

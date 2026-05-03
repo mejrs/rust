@@ -2,6 +2,7 @@
 
 use rustc_ast as ast;
 use rustc_ast::{GenericArg, MetaItem};
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_expand::base::{Annotatable, ExpandResult, ExtCtxt, MultiItemModifier};
 use rustc_span::{Span, Symbol, sym};
 use thin_vec::{ThinVec, thin_vec};
@@ -48,6 +49,7 @@ impl MultiItemModifier for BuiltinDerive {
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         meta_item: &MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
         is_derive_const: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable> {

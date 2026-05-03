@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
+use rustc_ast::diagnostic::{ConditionOptions, CustomDiagnostic, FormatArgs};
 use rustc_hir as hir;
-use rustc_hir::attrs::diagnostic::{ConditionOptions, CustomDiagnostic, FormatArgs};
 use rustc_hir::def_id::LocalDefId;
 use rustc_hir::find_attr;
 use rustc_middle::ty::print::PrintTraitRefExt;

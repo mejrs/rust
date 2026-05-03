@@ -1,5 +1,6 @@
 use rustc_ast as ast;
 use rustc_ast::tokenstream::TokenStream;
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_data_structures::profiling::TimingGuard;
 use rustc_errors::ErrorGuaranteed;
 use rustc_middle::ty::{self, TyCtxt};
@@ -95,6 +96,7 @@ impl MultiItemModifier for DeriveProcMacro {
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         _meta_item: &ast::MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
         _is_derive_const: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable> {

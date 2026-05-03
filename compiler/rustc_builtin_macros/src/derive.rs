@@ -1,5 +1,6 @@
 use rustc_ast as ast;
 use rustc_ast::{GenericParamKind, ItemKind, MetaItemInner, MetaItemKind, StmtKind};
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_attr_parsing::validate_attr;
 use rustc_expand::base::{
     Annotatable, DeriveResolution, ExpandResult, ExtCtxt, Indeterminate, MultiItemModifier,
@@ -21,6 +22,7 @@ impl MultiItemModifier for Expander {
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         meta_item: &ast::MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
         _: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable> {

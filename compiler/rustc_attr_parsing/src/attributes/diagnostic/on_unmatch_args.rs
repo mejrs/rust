@@ -1,5 +1,5 @@
+use rustc_ast::diagnostic::Directive;
 use rustc_errors::Diagnostic;
-use rustc_hir::attrs::diagnostic::Directive;
 use rustc_session::lint::builtin::MISPLACED_DIAGNOSTIC_ATTRIBUTES;
 
 use crate::attributes::diagnostic::*;

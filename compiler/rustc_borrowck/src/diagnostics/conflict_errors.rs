@@ -9,11 +9,11 @@ use rustc_data_structures::fx::FxIndexSet;
 use rustc_errors::codes::*;
 use rustc_errors::{Applicability, Diag, MultiSpan, struct_span_code_err};
 use rustc_hir as hir;
-use rustc_hir::attrs::diagnostic::{CustomDiagnostic, FormatArgs};
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::intravisit::{Visitor, walk_block, walk_expr};
 use rustc_hir::{
-    CoroutineDesugaring, CoroutineKind, CoroutineSource, LangItem, PatField, find_attr,
+    CoroutineDesugaring, CoroutineKind, CoroutineSource, CustomDiagnostic, FormatArgs, LangItem,
+    PatField, find_attr,
 };
 use rustc_middle::bug;
 use rustc_middle::hir::nested_filter::OnlyBodies;

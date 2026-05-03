@@ -10,6 +10,7 @@ use rustc_ast::attr::MarkedAttrs;
 use rustc_ast::tokenstream::TokenStream;
 use rustc_ast::visit::{AssocCtxt, Visitor};
 use rustc_ast::{self as ast, AttrVec, Attribute, HasAttrs, Item, NodeId, PatKind, Safety};
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_data_structures::fx::{FxHashMap, FxIndexMap};
 use rustc_data_structures::sync;
 use rustc_errors::{BufferedEarlyLint, DiagCtxtHandle, ErrorGuaranteed, PResult};
@@ -290,6 +291,7 @@ pub trait MultiItemModifier {
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         meta_item: &ast::MetaItem,
+        args: &ArgParser,
         item: Annotatable,
         is_derive_const: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable>;
@@ -297,17 +299,18 @@ pub trait MultiItemModifier {
 
 impl<F> MultiItemModifier for F
 where
-    F: Fn(&mut ExtCtxt<'_>, Span, &ast::MetaItem, Annotatable) -> Vec<Annotatable>,
+    F: Fn(&mut ExtCtxt<'_>, Span, &ast::MetaItem, &ArgParser, Annotatable) -> Vec<Annotatable>,
 {
     fn expand(
         &self,
         ecx: &mut ExtCtxt<'_>,
         span: Span,
         meta_item: &ast::MetaItem,
+        args: &ArgParser,
         item: Annotatable,
         _is_derive_const: bool,
     ) -> ExpandResult<Vec<Annotatable>, Annotatable> {
-        ExpandResult::Ready(self(ecx, span, meta_item, item))
+        ExpandResult::Ready(self(ecx, span, meta_item, args, item))
     }
 }
 
@@ -787,6 +790,8 @@ pub enum SyntaxExtensionKind {
     ///
     /// This is for delegated function implementations, and has nothing to do with glob imports.
     GlobDelegation(Arc<dyn GlobDelegationExpander + sync::DynSync + sync::DynSend>),
+
+    ActiveTool(Arc<dyn MultiItemModifier + sync::DynSync + sync::DynSend>),
 }
 
 impl SyntaxExtensionKind {
@@ -857,6 +862,7 @@ impl SyntaxExtension {
             | SyntaxExtensionKind::GlobDelegation(..) => MacroKinds::BANG,
             SyntaxExtensionKind::Attr(..)
             | SyntaxExtensionKind::LegacyAttr(..)
+            | SyntaxExtensionKind::ActiveTool(..)
             | SyntaxExtensionKind::NonMacroAttr => MacroKinds::ATTR,
             SyntaxExtensionKind::Derive(..) | SyntaxExtensionKind::LegacyDerive(..) => {
                 MacroKinds::DERIVE
@@ -999,6 +1005,7 @@ impl SyntaxExtension {
             _: &mut ExtCtxt<'_>,
             _: Span,
             _: &ast::MetaItem,
+            _: &ArgParser,
             _: Annotatable,
         ) -> Vec<Annotatable> {
             Vec::new()
@@ -1176,6 +1183,9 @@ pub trait ResolverExpand {
     /// Record the name of an opaque `Ty::ImplTrait` pre-expansion so that it can be used
     /// to generate an item name later that does not reference placeholder macros.
     fn insert_impl_trait_name(&mut self, id: NodeId, name: Symbol);
+
+    /// Inserts an active tool attribute.
+    fn insert_active_tool(&mut self, root: Symbol, name: Symbol, ext: SyntaxExtensionKind);
 
     /// Mark the scope as having a compile error so that error for lookup in this scope
     /// should be suppressed

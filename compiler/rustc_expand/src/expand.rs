@@ -13,7 +13,7 @@ use rustc_ast::{
     PatKind, StmtKind, TyKind, token,
 };
 use rustc_ast_pretty::pprust;
-use rustc_attr_parsing::parser::AllowExprMetavar;
+use rustc_attr_parsing::parser::{AllowExprMetavar, ArgParser};
 use rustc_attr_parsing::{
     AttributeParser, AttributeSafety, CFG_TEMPLATE, Early, EvalConfigResult, ShouldEmit,
     eval_config_entry, parse_cfg, validate_attr,
@@ -867,14 +867,27 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                         }
                         Err(guar) => return ExpandResult::Ready(fragment_kind.dummy(span, guar)),
                     }
-                } else if let SyntaxExtensionKind::LegacyAttr(expander) = ext {
+                } else if let SyntaxExtensionKind::LegacyAttr(expander)
+                | SyntaxExtensionKind::ActiveTool(expander) = ext
+                {
                     // `LegacyAttr` is only used for builtin attribute macros, which have their
                     // safety checked by `check_builtin_meta_item`, so we don't need to check
                     // `unsafety` here.
                     match validate_attr::parse_meta(&self.cx.sess.psess, &attr) {
                         Ok(meta) => {
                             let item_clone = macro_stats.then(|| item.clone());
-                            let items = match expander.expand(self.cx, span, &meta, item, false) {
+                            let Some(argparser) = ArgParser::from_attr_args(
+                                &attr.get_normal_item().args.unparsed_ref().unwrap(),
+                                &[],
+                                &self.cx.sess.psess,
+                                ShouldEmit::ErrorsAndLints { recovery: Recovery::Forbidden },
+                                AllowExprMetavar::No,
+                            ) else {
+                                panic!() // this ices on #[derive(unsafe(Debug))] and so on
+                            };
+                            let items = match expander
+                                .expand(self.cx, span, &meta, &argparser, item, false)
+                            {
                                 ExpandResult::Ready(items) => items,
                                 ExpandResult::Retry(item) => {
                                     // Reassemble the original invocation for retrying.
@@ -935,7 +948,14 @@ impl<'a, 'b> MacroExpander<'a, 'b> {
                         span,
                         path,
                     };
-                    let items = match expander.expand(self.cx, span, &meta, item, is_const) {
+                    let items = match expander.expand(
+                        self.cx,
+                        span,
+                        &meta,
+                        &ArgParser::NoArgs,
+                        item,
+                        is_const,
+                    ) {
                         ExpandResult::Ready(items) => items,
                         ExpandResult::Retry(item) => {
                             // Reassemble the original invocation for retrying.

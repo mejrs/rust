@@ -6,6 +6,7 @@ use std::{assert_matches, iter};
 use rustc_ast::{self as ast, GenericParamKind, attr, join_path_idents};
 use rustc_ast_pretty::pprust;
 use rustc_attr_parsing::AttributeParser;
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_errors::{Applicability, Diag, Level};
 use rustc_expand::base::*;
 use rustc_hir::Attribute;
@@ -28,6 +29,7 @@ pub(crate) fn expand_test_case(
     ecx: &mut ExtCtxt<'_>,
     attr_sp: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     anno_item: Annotatable,
 ) -> Vec<Annotatable> {
     check_builtin_macro_attribute(ecx, meta_item, sym::test_case);
@@ -88,6 +90,7 @@ pub(crate) fn expand_test(
     cx: &mut ExtCtxt<'_>,
     attr_sp: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     item: Annotatable,
 ) -> Vec<Annotatable> {
     check_builtin_macro_attribute(cx, meta_item, sym::test);
@@ -99,6 +102,7 @@ pub(crate) fn expand_bench(
     cx: &mut ExtCtxt<'_>,
     attr_sp: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     item: Annotatable,
 ) -> Vec<Annotatable> {
     check_builtin_macro_attribute(cx, meta_item, sym::bench);

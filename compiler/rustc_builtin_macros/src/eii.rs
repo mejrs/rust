@@ -5,6 +5,7 @@ use rustc_ast::{
     Visibility, ast,
 };
 use rustc_ast_pretty::pprust::path_to_string;
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::{ErrorGuaranteed, Ident, Span, kw, sym};
 use thin_vec::{ThinVec, thin_vec};
@@ -39,24 +40,27 @@ pub(crate) fn eii(
     ecx: &mut ExtCtxt<'_>,
     span: Span,
     meta_item: &ast::MetaItem,
+    args: &ArgParser,
     item: Annotatable,
 ) -> Vec<Annotatable> {
-    eii_(ecx, span, meta_item, item, false)
+    eii_(ecx, span, meta_item, args, item, false)
 }
 
 pub(crate) fn unsafe_eii(
     ecx: &mut ExtCtxt<'_>,
     span: Span,
     meta_item: &ast::MetaItem,
+    args: &ArgParser,
     item: Annotatable,
 ) -> Vec<Annotatable> {
-    eii_(ecx, span, meta_item, item, true)
+    eii_(ecx, span, meta_item, args, item, true)
 }
 
 fn eii_(
     ecx: &mut ExtCtxt<'_>,
     eii_attr_span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     orig_item: Annotatable,
     impl_unsafe: bool,
 ) -> Vec<Annotatable> {
@@ -442,6 +446,7 @@ pub(crate) fn eii_declaration(
     ecx: &mut ExtCtxt<'_>,
     span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     mut item: Annotatable,
 ) -> Vec<Annotatable> {
     let i = if let Annotatable::Item(ref mut item) = item {
@@ -498,6 +503,7 @@ pub(crate) fn eii_shared_macro(
     ecx: &mut ExtCtxt<'_>,
     span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     mut item: Annotatable,
 ) -> Vec<Annotatable> {
     let i = if let Annotatable::Item(ref mut item) = item {

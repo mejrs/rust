@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
+use rustc_ast::diagnostic::{CustomDiagnostic, Directive, FormatArgs};
 use rustc_ast::token::{self, Token};
 use rustc_ast::tokenstream::TokenStream;
 use rustc_errors::{Applicability, Diag, DiagCtxtHandle, DiagMessage};
-use rustc_hir::attrs::diagnostic::{CustomDiagnostic, Directive, FormatArgs};
 use rustc_macros::Subdiagnostic;
 use rustc_parse::parser::{Parser, Recovery, token_descr};
 use rustc_session::parse::ParseSess;

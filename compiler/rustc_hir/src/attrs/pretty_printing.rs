@@ -209,4 +209,5 @@ print_debug!(
     CfgEntry,
     DiffActivity,
     DiffMode,
+    rustc_ast::diagnostic::Directive
 );

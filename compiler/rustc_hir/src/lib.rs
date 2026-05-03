@@ -43,6 +43,7 @@ mod tests;
 pub use hir::*;
 pub use lang_items::{LangItem, LanguageItems};
 pub use rustc_ast::attr::version::*;
+pub use rustc_ast::diagnostic::*;
 pub use stability::*;
 pub use target::{MethodKind, Target};
 

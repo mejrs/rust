@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::{mem, slice};
 
 use ast::token::IdentIsRaw;
+use rustc_ast::diagnostic::Directive;
 use rustc_ast::token::NtPatKind::*;
 use rustc_ast::token::TokenKind::*;
 use rustc_ast::token::{self, Delimiter, NonterminalKind, Token, TokenKind};
@@ -14,7 +15,6 @@ use rustc_data_structures::fx::{FxHashMap, FxIndexMap};
 use rustc_errors::{Applicability, Diag, ErrorGuaranteed, MultiSpan};
 use rustc_feature::Features;
 use rustc_hir as hir;
-use rustc_hir::attrs::diagnostic::Directive;
 use rustc_hir::def::MacroKinds;
 use rustc_hir::find_attr;
 use rustc_lint_defs::builtin::{

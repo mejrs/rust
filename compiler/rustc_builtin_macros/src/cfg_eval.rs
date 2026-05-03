@@ -4,6 +4,7 @@ use rustc_ast as ast;
 use rustc_ast::mut_visit::MutVisitor;
 use rustc_ast::visit::{AssocCtxt, Visitor};
 use rustc_ast::{Attribute, HasAttrs, HasTokens, NodeId, mut_visit, visit};
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_errors::PResult;
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_expand::config::StripUnconfigured;
@@ -21,6 +22,7 @@ pub(crate) fn expand(
     ecx: &mut ExtCtxt<'_>,
     _span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     annotatable: Annotatable,
 ) -> Vec<Annotatable> {
     check_builtin_macro_attribute(ecx, meta_item, sym::cfg_eval);

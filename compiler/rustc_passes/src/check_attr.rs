@@ -9,13 +9,13 @@ use std::cell::Cell;
 use std::slice;
 
 use rustc_abi::ExternAbi;
+use rustc_ast::diagnostic::Directive;
 use rustc_ast::{AttrStyle, MetaItemKind, ast};
 use rustc_attr_parsing::{AttributeParser, Late};
 use rustc_data_structures::thin_vec::ThinVec;
 use rustc_data_structures::unord::UnordMap;
 use rustc_errors::{DiagCtxtHandle, IntoDiagArg, MultiSpan, msg};
 use rustc_feature::BUILTIN_ATTRIBUTE_MAP;
-use rustc_hir::attrs::diagnostic::Directive;
 use rustc_hir::attrs::{
     AttributeKind, DocAttribute, DocInline, EiiDecl, EiiImpl, EiiImplResolution, InlineAttr,
     ReprAttr, SanitizerSet,

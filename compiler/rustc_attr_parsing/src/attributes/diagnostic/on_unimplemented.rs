@@ -1,5 +1,5 @@
+use rustc_ast::diagnostic::Directive;
 use rustc_errors::Diagnostic;
-use rustc_hir::attrs::diagnostic::Directive;
 use rustc_session::lint::builtin::MISPLACED_DIAGNOSTIC_ATTRIBUTES;
 
 use crate::attributes::diagnostic::*;
@@ -60,9 +60,8 @@ impl<S: Stage> AttributeParser<S> for OnUnimplementedParser {
     const ALLOWED_TARGETS: AllowedTargets = AllowedTargets::AllowList(ALL_TARGETS);
 
     fn finalize(self, _cx: &FinalizeContext<'_, '_, S>) -> Option<AttributeKind> {
-        if let Some(span) = self.span {
+        if let Some(_span) = self.span {
             Some(AttributeKind::OnUnimplemented {
-                span,
                 directive: self.directive.map(|d| Box::new(d.1)),
             })
         } else {

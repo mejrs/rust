@@ -4,6 +4,7 @@ use std::cmp::Ordering;
 use std::mem;
 
 use itertools::Itertools;
+use rustc_ast::diagnostic::{CustomDiagnostic, Directive, FormatArgs};
 use rustc_ast::{Item, NodeId};
 use rustc_attr_parsing::AttributeParser;
 use rustc_data_structures::fx::{FxHashSet, FxIndexSet};
@@ -12,7 +13,6 @@ use rustc_errors::codes::*;
 use rustc_errors::{Applicability, Diagnostic, MultiSpan, pluralize, struct_span_code_err};
 use rustc_hir::Attribute;
 use rustc_hir::attrs::AttributeKind;
-use rustc_hir::attrs::diagnostic::{CustomDiagnostic, Directive, FormatArgs};
 use rustc_hir::def::{self, DefKind, PartialRes};
 use rustc_hir::def_id::{DefId, LocalDefIdMap};
 use rustc_middle::metadata::{AmbigModChild, ModChild, Reexport};

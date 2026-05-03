@@ -1,4 +1,5 @@
 use rustc_ast::{DUMMY_NODE_ID, ast};
+use rustc_attr_parsing::parser::ArgParser;
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::Span;
 
@@ -6,6 +7,7 @@ pub(crate) fn expand(
     ecx: &mut ExtCtxt<'_>,
     _expand_span: Span,
     meta_item: &ast::MetaItem,
+    _args: &ArgParser,
     mut item: Annotatable,
 ) -> Vec<Annotatable> {
     let define_opaque = match &mut item {

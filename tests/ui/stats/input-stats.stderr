@@ -64,15 +64,15 @@ hir-stats HIR STATS: input_stats
 hir-stats Name                Accumulated Size         Count     Item Size
 hir-stats ----------------------------------------------------------------
 hir-stats PathSegment            1_776 (NN.N%)            37            48
+hir-stats Item                   1_056 (NN.N%)            11            96
+hir-stats - Enum                      96 (NN.N%)             1
+hir-stats - ExternCrate               96 (NN.N%)             1
+hir-stats - ForeignMod                96 (NN.N%)             1
+hir-stats - Impl                      96 (NN.N%)             1
+hir-stats - Trait                     96 (NN.N%)             1
+hir-stats - Fn                       192 (NN.N%)             2
+hir-stats - Use                      384 (NN.N%)             4
 hir-stats Path                   1_040 (NN.N%)            26            40
-hir-stats Item                     968 (NN.N%)            11            88
-hir-stats - Enum                      88 (NN.N%)             1
-hir-stats - ExternCrate               88 (NN.N%)             1
-hir-stats - ForeignMod                88 (NN.N%)             1
-hir-stats - Impl                      88 (NN.N%)             1
-hir-stats - Trait                     88 (NN.N%)             1
-hir-stats - Fn                       176 (NN.N%)             2
-hir-stats - Use                      352 (NN.N%)             4
 hir-stats Expr                     768 (NN.N%)            12            64
 hir-stats - InlineAsm                 64 (NN.N%)             1
 hir-stats - Match                     64 (NN.N%)             1
@@ -119,5 +119,5 @@ hir-stats TraitItemId                8 (NN.N%)             2             4
 hir-stats ImplItemId                 8 (NN.N%)             2             4
 hir-stats ForeignItemId              4 (NN.N%)             1             4
 hir-stats ----------------------------------------------------------------
-hir-stats Total                  8_576                   172
+hir-stats Total                  8_664                   172
 hir-stats ================================================================

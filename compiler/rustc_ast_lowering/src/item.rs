@@ -227,7 +227,16 @@ impl<'hir> LoweringContext<'_, 'hir> {
                 .lower_eii_decl(id, *name, target)
                 .map(|decl| vec![hir::Attribute::Parsed(AttributeKind::EiiDeclaration(decl))])
                 .unwrap_or_default(),
-
+            ItemKind::Trait(box Trait { on_unimplemented, .. }) => {
+                if let Some(ou) = on_unimplemented {
+                    // FIXME Lower here
+                    vec![hir::Attribute::Parsed(AttributeKind::OnUnimplemented {
+                        directive: Some(Box::new(ou.clone())),
+                    })]
+                } else {
+                    Vec::new()
+                }
+            }
             ItemKind::ExternCrate(..)
             | ItemKind::Use(..)
             | ItemKind::Const(..)
@@ -239,7 +248,6 @@ impl<'hir> LoweringContext<'_, 'hir> {
             | ItemKind::Enum(..)
             | ItemKind::Struct(..)
             | ItemKind::Union(..)
-            | ItemKind::Trait(..)
             | ItemKind::TraitAlias(..)
             | ItemKind::Impl(..)
             | ItemKind::MacCall(..)
@@ -548,6 +556,7 @@ impl<'hir> LoweringContext<'_, 'hir> {
                 generics,
                 bounds,
                 items,
+                on_unimplemented: _,
             }) => {
                 let constness = self.lower_constness(*constness);
                 let impl_restriction = self.lower_impl_restriction(impl_restriction);

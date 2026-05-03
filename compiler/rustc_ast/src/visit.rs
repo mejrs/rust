@@ -19,6 +19,7 @@ use rustc_span::{Ident, Span, Spanned, Symbol};
 use thin_vec::ThinVec;
 
 use crate::ast::*;
+use crate::diagnostic::{Directive, OnUnimplementedCondition, Predicate};
 use crate::tokenstream::DelimSpan;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -394,6 +395,8 @@ macro_rules! common_visitor_and_walkers {
             ThinVec<Box<Ty>>,
             ThinVec<TyPat>,
             ThinVec<EiiImpl>,
+            ThinVec<Directive>,
+            ThinVec<Predicate>,
         );
 
         // This macro generates `impl Visitable` and `impl MutVisitable` that forward to `Walkable`
@@ -494,6 +497,9 @@ macro_rules! common_visitor_and_walkers {
             YieldKind,
             EiiDecl,
             EiiImpl,
+            Directive,
+            OnUnimplementedCondition,
+            Predicate,
         );
 
         /// Each method of this trait is a hook to be potentially

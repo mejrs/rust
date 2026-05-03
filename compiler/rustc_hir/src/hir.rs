@@ -4465,7 +4465,7 @@ impl<'hir> Item<'hir> {
                 Ident,
                 &'hir Generics<'hir>,
                 GenericBounds<'hir>,
-                &'hir [TraitItemId]
+                &'hir [TraitItemId],
             ),
             ItemKind::Trait { impl_restriction, constness, is_auto, safety, ident, generics, bounds, items },
             (impl_restriction, *constness, *is_auto, *safety, *ident, generics, bounds, items);

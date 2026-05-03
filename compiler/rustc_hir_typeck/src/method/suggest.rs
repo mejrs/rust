@@ -9,6 +9,7 @@ use std::path::PathBuf;
 
 use hir::Expr;
 use rustc_ast::ast::Mutability;
+use rustc_ast::diagnostic::CustomDiagnostic;
 use rustc_data_structures::fx::{FxIndexMap, FxIndexSet};
 use rustc_data_structures::sorted_map::SortedMap;
 use rustc_data_structures::unord::UnordSet;
@@ -16,7 +17,6 @@ use rustc_errors::codes::*;
 use rustc_errors::{
     Applicability, Diag, MultiSpan, StashKey, StringPart, listify, pluralize, struct_span_code_err,
 };
-use rustc_hir::attrs::diagnostic::CustomDiagnostic;
 use rustc_hir::def::{CtorKind, DefKind, Res};
 use rustc_hir::def_id::DefId;
 use rustc_hir::intravisit::{self, Visitor};

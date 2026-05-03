@@ -1,11 +1,11 @@
 use std::ops::Range;
 
-use rustc_errors::{Diagnostic, E0232};
-use rustc_hir::AttrPath;
-use rustc_hir::attrs::diagnostic::{
+use rustc_ast::diagnostic::{
     Directive, FilterFormatString, Flag, FormatArg, FormatString, LitOrArg, Name, NameValue,
     OnUnimplementedCondition, Piece, Predicate,
 };
+use rustc_errors::{Diagnostic, E0232};
+use rustc_hir::AttrPath;
 use rustc_macros::Diagnostic;
 use rustc_parse_format::{
     Argument, FormatSpec, ParseError, ParseMode, Parser, Piece as RpfPiece, Position,
@@ -111,7 +111,14 @@ impl Mode {
         }
     }
 }
+pub fn parse_rustc_on_unimplemented(
+    cx: &mut AcceptContext<'_, '_, crate::Early>,
+    args: &ArgParser,
+) -> Option<Directive> {
+    let items = parse_list(cx, args, Mode::RustcOnUnimplemented)?;
 
+    parse_directive_items(cx, Mode::RustcOnUnimplemented, items.mixed(), true)
+}
 fn merge_directives<S: Stage>(
     cx: &mut AcceptContext<'_, '_, S>,
     first: &mut Option<(Span, Directive)>,
@@ -140,6 +147,7 @@ fn merge<T, S: Stage>(
         (Some(_) | None, None) => {}
         (Some((first_span, _)), Some((later_span, _))) => {
             let first_span = *first_span;
+
             cx.emit_dyn_lint(
                 MALFORMED_DIAGNOSTIC_ATTRIBUTES,
                 move |dcx, level| {

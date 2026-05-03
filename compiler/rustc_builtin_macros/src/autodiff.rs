@@ -18,6 +18,7 @@ mod llvm_enzyme {
         FnRetTy, FnSig, GenericArg, GenericArgs, GenericParamKind, Generics, ItemKind,
         MetaItemInner, MgcaDisambiguation, PatKind, Path, PathSegment, TyKind, Visibility,
     };
+    use rustc_attr_parsing::parser::ArgParser;
     use rustc_expand::base::{Annotatable, ExtCtxt};
     use rustc_hir::attrs::RustcAutodiff;
     use rustc_span::{Ident, Span, Symbol, kw, sym};
@@ -165,6 +166,7 @@ mod llvm_enzyme {
         ecx: &mut ExtCtxt<'_>,
         expand_span: Span,
         meta_item: &ast::MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
     ) -> Vec<Annotatable> {
         expand_with_mode(ecx, expand_span, meta_item, item, DiffMode::Forward)
@@ -174,6 +176,7 @@ mod llvm_enzyme {
         ecx: &mut ExtCtxt<'_>,
         expand_span: Span,
         meta_item: &ast::MetaItem,
+        _args: &ArgParser,
         item: Annotatable,
     ) -> Vec<Annotatable> {
         expand_with_mode(ecx, expand_span, meta_item, item, DiffMode::Reverse)

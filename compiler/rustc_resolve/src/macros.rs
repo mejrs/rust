@@ -556,6 +556,11 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
     fn insert_impl_trait_name(&mut self, id: NodeId, name: Symbol) {
         self.impl_trait_names.insert(id, name);
     }
+
+    fn insert_active_tool(&mut self, root: Symbol, name: Symbol, kind: SyntaxExtensionKind) {
+        let ext = Arc::new(SyntaxExtension::default(kind, self.tcx.sess.edition()));
+        self.active_tools.insert((root, name), ext);
+    }
 }
 
 impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
@@ -614,7 +619,10 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
             if let Some(args) = &segment.args {
                 self.dcx().emit_err(errors::GenericArgumentsInMacroPath { span: args.span() });
             }
-            if kind == MacroKind::Attr && segment.ident.as_str().starts_with("rustc") {
+            if kind == MacroKind::Attr
+                && segment.ident.as_str().starts_with("rustc")
+                && !self.tcx.features().rustc_attrs()
+            {
                 if idx == 0 {
                     self.dcx().emit_err(errors::AttributesStartingWithRustcAreReserved {
                         span: segment.ident.span,
@@ -711,6 +719,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
             (sym::on_const, Some(sym::diagnostic_on_const)),
             (sym::on_unknown, Some(sym::diagnostic_on_unknown)),
             (sym::on_unmatch_args, Some(sym::diagnostic_on_unmatch_args)),
+            (sym::rustc_on_unimplemented, Some(sym::rustc_attrs)),
         ];
 
         if res == Res::NonMacroAttr(NonMacroAttrKind::Tool)
@@ -823,7 +832,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
             };
 
             self.multi_segment_macro_resolutions.borrow_mut(&self).push((
-                path,
+                path.clone(),
                 path_span,
                 kind,
                 *parent_scope,
@@ -869,21 +878,33 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
         };
 
         let res = res?;
-        let ext = match deleg_impl {
-            Some((impl_def_id, star_span)) => match res {
-                Res::Def(DefKind::Trait, def_id) => {
-                    let edition = self.tcx.sess.edition();
-                    Some(Arc::new(SyntaxExtension::glob_delegation(
-                        def_id,
-                        impl_def_id,
-                        star_span,
-                        edition,
-                    )))
-                }
-                _ => None,
-            },
-            None => self.get_macro(res).map(|macro_data| Arc::clone(&macro_data.ext)),
+        let ext = 'ext: {
+            if let Some((impl_def_id, star_span)) = deleg_impl
+                && let Res::Def(DefKind::Trait, def_id) = res
+            {
+                let edition = self.tcx.sess.edition();
+                break 'ext Some(Arc::new(SyntaxExtension::glob_delegation(
+                    def_id,
+                    impl_def_id,
+                    star_span,
+                    edition,
+                )));
+            }
+
+            if res == Res::NonMacroAttr(NonMacroAttrKind::Tool)
+                && let [namespace, active_tool] = &*path
+                && let Some(ext) =
+                    self.active_tools.get(&(namespace.ident.name, active_tool.ident.name))
+            {
+                break 'ext Some(Arc::clone(ext));
+            }
+
+            if let Some(macro_data) = self.get_macro(res) {
+                break 'ext Some(Arc::clone(&macro_data.ext));
+            }
+            None
         };
+
         Ok((ext, res))
     }
 
@@ -1057,6 +1078,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                         );
                     }
                 }
+                Err(..) if ident.name == sym::rustc_on_unimplemented => {}
                 Err(..) => {
                     let expected = kind.descr_expected();
 

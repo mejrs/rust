@@ -5,6 +5,7 @@ use std::path::PathBuf;
 pub use ReprAttr::*;
 use rustc_abi::Align;
 pub use rustc_ast::attr::data_structures::*;
+use rustc_ast::diagnostic::Directive;
 use rustc_ast::expand::autodiff_attrs::{DiffActivity, DiffMode};
 use rustc_ast::expand::typetree::TypeTree;
 use rustc_ast::token::DocFragmentKind;
@@ -19,7 +20,6 @@ use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
 pub use rustc_target::spec::SanitizerSet;
 use thin_vec::ThinVec;
 
-use crate::attrs::diagnostic::*;
 use crate::attrs::pretty_printing::PrintAttribute;
 use crate::limit::Limit;
 use crate::{DefaultBodyStability, PartialConstStability, RustcVersion, Stability};
@@ -1200,7 +1200,6 @@ pub enum AttributeKind {
 
     /// Represents `#[rustc_on_unimplemented]` and `#[diagnostic::on_unimplemented]`.
     OnUnimplemented {
-        span: Span,
         /// None if the directive was malformed in some way.
         directive: Option<Box<Directive>>,
     },
