@@ -22,7 +22,7 @@ impl<T: Pointee + ?Sized, A: Allocator> UninitBox<T, A> {
         let layout = unsafe { Layout::for_value_raw(ptr) };
 
         let ptr = if layout.size() == 0 {
-            layout.dangling().cast::<()>()
+            layout.dangling_ptr().cast::<()>()
         } else {
             alloc.allocate(layout).unwrap_or_else(|_| handle_alloc_error(layout)).cast()
         };
