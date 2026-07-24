@@ -44,6 +44,15 @@ LL | #[rustc_dummy]
    = note: the `rustc_dummy` attribute is an internal implementation detail that will never be stable
    = note: the `rustc_dummy` attribute is used for rustc unit tests
 
-error: aborting due to 7 previous errors
+error[E0658]: use of an internal attribute
+  --> $DIR/feature-gate-rustc-attrs.rs:29:3
+   |
+LL | #[rustc_paren_sugar]
+   |   ^^^^^^^^^^^^^^^^^
+   |
+   = help: add `#![feature(rustc_attrs)]` to the crate attributes to enable
+   = note: the `rustc_paren_sugar` attribute is an internal implementation detail that will never be stable
+
+error: aborting due to 8 previous errors
 
 For more information about this error, try `rustc --explain E0658`.

@@ -25,3 +25,8 @@ fn g() {}
 //~^ ERROR attributes starting with `rustc` are reserved for use by the `rustc` compiler
 //~| ERROR cannot find attribute `rustc_unknown` in this scope
 fn main() {}
+
+#[rustc_paren_sugar]
+//~^ ERROR use of an internal attribute [E0658]
+//~| NOTE the `rustc_paren_sugar` attribute is an internal implementation detail that will never be stable
+pub trait Fn<Args> {}
