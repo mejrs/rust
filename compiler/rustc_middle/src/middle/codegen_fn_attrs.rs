@@ -4,8 +4,8 @@ use rustc_abi::Align;
 use rustc_hir::attrs::{InlineAttr, InstructionSetAttr, Linkage, OptimizeAttr, RtsanSetting};
 use rustc_hir::def_id::DefId;
 use rustc_macros::{StableHash, TyDecodable, TyEncodable};
+use rustc_sanitize::SanitizerSet;
 use rustc_span::Symbol;
-use rustc_target::spec::SanitizerSet;
 
 use crate::mono::Visibility;
 use crate::ty::{InstanceKind, ShimKind, TyCtxt};

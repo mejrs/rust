@@ -1,6 +1,8 @@
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, Cc, CodeModel, LinkerFlavor, Lld, LlvmAbi, PanicStrategy, RelocModel, SanitizerSet,
-    Target, TargetMetadata, TargetOptions,
+    Arch, Cc, CodeModel, LinkerFlavor, Lld, LlvmAbi, PanicStrategy, RelocModel, Target,
+    TargetMetadata, TargetOptions,
 };
 
 pub(crate) fn target() -> Target {

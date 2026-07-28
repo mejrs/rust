@@ -1,4 +1,6 @@
-use crate::spec::{Os, SanitizerSet, TargetOptions, TlsModel, base};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Os, TargetOptions, TlsModel, base};
 
 pub(crate) fn opts() -> TargetOptions {
     let mut base = base::linux::opts();

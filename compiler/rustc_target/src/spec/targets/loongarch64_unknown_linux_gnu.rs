@@ -1,6 +1,6 @@
-use crate::spec::{
-    Arch, CodeModel, LlvmAbi, SanitizerSet, Target, TargetMetadata, TargetOptions, base,
-};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, CodeModel, LlvmAbi, Target, TargetMetadata, TargetOptions, base};
 
 pub(crate) fn target() -> Target {
     Target {

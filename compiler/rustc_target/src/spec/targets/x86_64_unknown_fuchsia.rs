@@ -1,4 +1,6 @@
-use crate::spec::{Arch, SanitizerSet, StackProbeType, Target, TargetMetadata, base};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, StackProbeType, Target, TargetMetadata, base};
 
 pub(crate) fn target() -> Target {
     let mut base = base::fuchsia::opts();

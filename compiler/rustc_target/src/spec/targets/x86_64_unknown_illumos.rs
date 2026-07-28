@@ -1,4 +1,6 @@
-use crate::spec::{Arch, Cc, LinkerFlavor, SanitizerSet, Target, TargetMetadata, base};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, Cc, LinkerFlavor, Target, TargetMetadata, base};
 
 pub(crate) fn target() -> Target {
     let mut base = base::illumos::opts();

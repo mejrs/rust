@@ -1,7 +1,8 @@
 use rustc_abi::Endian;
+use rustc_sanitize::SanitizerSet;
 
 use crate::spec::{
-    Arch, FramePointer, SanitizerSet, StackProbeType, Target, TargetMetadata, TargetOptions, base,
+    Arch, FramePointer, StackProbeType, Target, TargetMetadata, TargetOptions, base,
 };
 
 pub(crate) fn target() -> Target {

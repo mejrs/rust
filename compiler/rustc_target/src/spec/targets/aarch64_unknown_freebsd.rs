@@ -1,6 +1,6 @@
-use crate::spec::{
-    Arch, SanitizerSet, StackProbeType, Target, TargetMetadata, TargetOptions, base,
-};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, StackProbeType, Target, TargetMetadata, TargetOptions, base};
 
 pub(crate) fn target() -> Target {
     Target {

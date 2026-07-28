@@ -1,6 +1,6 @@
-use crate::spec::{
-    Arch, CfgAbi, FloatAbi, SanitizerSet, Target, TargetMetadata, TargetOptions, base,
-};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, CfgAbi, FloatAbi, Target, TargetMetadata, TargetOptions, base};
 
 // This target is for glibc Linux on ARMv7 without NEON or
 // thumb-mode. See the thumbv7neon variant for enabling both.

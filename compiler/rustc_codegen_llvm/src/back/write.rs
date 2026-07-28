@@ -20,10 +20,11 @@ use rustc_data_structures::small_c_str::SmallCStr;
 use rustc_errors::{DiagCtxt, DiagCtxtHandle, Level};
 use rustc_fs_util::{link_or_copy, path_to_c_string};
 use rustc_middle::ty::TyCtxt;
+use rustc_sanitize::SanitizerSet;
 use rustc_session::Session;
 use rustc_session::config::{self, Lto, OutputType, Passes, SplitDwarfKind, SwitchWithOptPath};
 use rustc_span::{BytePos, InnerSpan, Pos, RemapPathScopeComponents, SpanData, SyntaxContext};
-use rustc_target::spec::{CodeModel, FloatAbi, RelocModel, SanitizerSet, SplitDebuginfo, TlsModel};
+use rustc_target::spec::{CodeModel, FloatAbi, RelocModel, SplitDebuginfo, TlsModel};
 use tracing::{debug, trace};
 
 use crate::back::lto::{Buffer, ModuleBuffer};

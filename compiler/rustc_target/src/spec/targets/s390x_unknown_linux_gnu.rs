@@ -1,6 +1,7 @@
 use rustc_abi::{Align, Endian};
+use rustc_sanitize::SanitizerSet;
 
-use crate::spec::{Arch, SanitizerSet, StackProbeType, Target, TargetMetadata, base};
+use crate::spec::{Arch, StackProbeType, Target, TargetMetadata, base};
 
 pub(crate) fn target() -> Target {
     let mut base = base::linux_gnu::opts();

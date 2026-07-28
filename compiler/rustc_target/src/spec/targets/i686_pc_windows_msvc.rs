@@ -1,4 +1,6 @@
-use crate::spec::{Arch, LinkerFlavor, Lld, RustcAbi, SanitizerSet, Target, TargetMetadata, base};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, LinkerFlavor, Lld, RustcAbi, Target, TargetMetadata, base};
 
 pub(crate) fn target() -> Target {
     let mut base = base::windows_msvc::opts();

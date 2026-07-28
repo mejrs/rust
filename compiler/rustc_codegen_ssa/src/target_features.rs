@@ -6,11 +6,12 @@ use rustc_hir::def_id::{DefId, LOCAL_CRATE, LocalDefId};
 use rustc_middle::middle::codegen_fn_attrs::{TargetFeature, TargetFeatureKind};
 use rustc_middle::query::Providers;
 use rustc_middle::ty::TyCtxt;
+use rustc_sanitize::SanitizerSet;
 use rustc_session::Session;
 use rustc_session::diagnostics::feature_err;
 use rustc_session::lint::builtin::AARCH64_SOFTFLOAT_NEON;
 use rustc_span::{Span, Symbol, edit_distance, sym};
-use rustc_target::spec::{Arch, SanitizerSet};
+use rustc_target::spec::Arch;
 use rustc_target::target_features::{RUSTC_SPECIFIC_FEATURES, Stability};
 use smallvec::SmallVec;
 

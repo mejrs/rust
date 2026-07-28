@@ -1,4 +1,6 @@
-use crate::spec::{SanitizerSet, Target, TargetMetadata};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Target, TargetMetadata};
 
 pub(crate) fn target() -> Target {
     let mut base = super::x86_64_unknown_linux_gnu::target();

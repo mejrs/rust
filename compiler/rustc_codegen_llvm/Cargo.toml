@@ -31,6 +31,7 @@ rustc_llvm = { path = "../rustc_llvm" }
 rustc_macros = { path = "../rustc_macros" }
 rustc_metadata = { path = "../rustc_metadata" }
 rustc_middle = { path = "../rustc_middle" }
+rustc_sanitize = { path = "../rustc_sanitize" }
 rustc_sanitizer_support = { path = "../rustc_sanitizer_support" }
 rustc_session = { path = "../rustc_session" }
 rustc_span = { path = "../rustc_span" }

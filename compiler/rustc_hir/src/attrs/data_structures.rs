@@ -14,10 +14,10 @@ use rustc_data_structures::Limit;
 use rustc_data_structures::fx::FxIndexMap;
 use rustc_error_messages::{DiagArgValue, IntoDiagArg};
 use rustc_macros::{Decodable, Encodable, PrintAttribute, StableHash};
+pub use rustc_sanitize::SanitizerSet;
 use rustc_span::def_id::DefId;
 use rustc_span::hygiene::Transparency;
 use rustc_span::{ErrorGuaranteed, Ident, Span, Symbol};
-pub use rustc_target::spec::SanitizerSet;
 use thin_vec::ThinVec;
 
 pub use crate::attrs::canonical_symbols::{CanonicalSymbol, CanonicalSymbols};

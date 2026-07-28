@@ -2,17 +2,28 @@ use std::collections::BTreeMap;
 use std::str::FromStr;
 
 use rustc_abi::{Align, AlignFromBytesError};
+use rustc_sanitize::SanitizerSet;
 
 use super::crt_objects::CrtObjects;
 use super::{
     Arch, BinaryFormat, CfgAbi, CodeModel, DebuginfoKind, Env, FloatAbi, FramePointer, LinkArgsCli,
     LinkSelfContainedComponents, LinkSelfContainedDefault, LinkerFlavorCli, LldFlavor,
-    MergeFunctions, Os, PanicStrategy, RelocModel, RelroLevel, RustcAbi, SanitizerSet,
-    SmallDataThresholdSupport, SplitDebuginfo, StackProbeType, StaticCow, SymbolVisibility, Target,
-    TargetKind, TargetOptions, TargetWarnings, TlsModel,
+    MergeFunctions, Os, PanicStrategy, RelocModel, RelroLevel, RustcAbi, SmallDataThresholdSupport,
+    SplitDebuginfo, StackProbeType, StaticCow, SymbolVisibility, Target, TargetKind, TargetOptions,
+    TargetWarnings, TlsModel,
 };
 use crate::json::{Json, ToJson};
 use crate::spec::{AbiMap, LlvmAbi};
+
+impl ToJson for SanitizerSet {
+    fn to_json(&self) -> Json {
+        self.into_iter()
+            .map(|v| Some(v.as_str()?.to_json()))
+            .collect::<Option<Vec<_>>>()
+            .unwrap_or_default()
+            .to_json()
+    }
+}
 
 impl Target {
     /// Loads a target descriptor from a JSON object.

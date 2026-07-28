@@ -7,12 +7,13 @@ use rustc_middle::middle::codegen_fn_attrs::{
     TargetFeature,
 };
 use rustc_middle::ty::{self, Instance, TyCtxt};
+use rustc_sanitize::SanitizerSet;
 use rustc_session::config::{
     BranchProtection, FunctionReturn, InstrumentMcount, OptLevel, PAuthKey, PacRet,
 };
 use rustc_span::sym;
 use rustc_symbol_mangling::mangle_internal_symbol;
-use rustc_target::spec::{Arch, FramePointer, SanitizerSet, StackProbeType, StackProtector};
+use rustc_target::spec::{Arch, FramePointer, StackProbeType, StackProtector};
 use smallvec::SmallVec;
 
 use crate::context::SimpleCx;

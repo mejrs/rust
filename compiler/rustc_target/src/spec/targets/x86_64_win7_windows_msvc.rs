@@ -1,4 +1,6 @@
-use crate::spec::{Arch, SanitizerSet, Target, TargetMetadata, TargetOptions, base};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, Target, TargetMetadata, TargetOptions, base};
 
 pub(crate) fn target() -> Target {
     let base = TargetOptions {

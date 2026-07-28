@@ -12,11 +12,12 @@ use rustc_codegen_ssa::traits::*;
 use rustc_middle::ty::Ty;
 use rustc_middle::ty::layout::LayoutOf;
 use rustc_middle::{bug, ty};
+use rustc_sanitize::SanitizerSet;
 use rustc_session::{Session, config};
 use rustc_target::callconv::{
     ArgAbi, ArgAttribute, ArgAttributes, ArgExtension, CastTarget, FnAbi, PassMode,
 };
-use rustc_target::spec::{Arch, SanitizerSet};
+use rustc_target::spec::Arch;
 use smallvec::SmallVec;
 
 use crate::attributes::{self, llfn_attrs_from_instance};

@@ -6,9 +6,11 @@
 //
 // For example, `-C target-cpu=cortex-a53`.
 
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, Cc, LinkerFlavor, Lld, Os, PanicStrategy, RelocModel, SanitizerSet, StackProbeType,
-    Target, TargetMetadata, TargetOptions, cvs,
+    Arch, Cc, LinkerFlavor, Lld, Os, PanicStrategy, RelocModel, StackProbeType, Target,
+    TargetMetadata, TargetOptions, cvs,
 };
 
 pub(crate) fn target() -> Target {

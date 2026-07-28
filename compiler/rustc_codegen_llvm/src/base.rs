@@ -23,9 +23,9 @@ use rustc_middle::dep_graph;
 use rustc_middle::middle::codegen_fn_attrs::{CodegenFnAttrs, SanitizerFnAttrs};
 use rustc_middle::mono::Visibility;
 use rustc_middle::ty::TyCtxt;
+use rustc_sanitize::SanitizerSet;
 use rustc_session::config::{DebugInfo, Offload};
 use rustc_span::Symbol;
-use rustc_target::spec::SanitizerSet;
 
 use super::ModuleLlvm;
 use crate::attributes;

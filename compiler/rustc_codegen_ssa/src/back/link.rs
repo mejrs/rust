@@ -35,6 +35,7 @@ use rustc_middle::lint::emit_lint_base;
 use rustc_middle::middle::debugger_visualizer::DebuggerVisualizerFile;
 use rustc_middle::middle::dependency_format::Linkage;
 use rustc_middle::middle::exported_symbols::SymbolExportKind;
+use rustc_sanitize::SanitizerSet;
 use rustc_session::config::{
     self, CFGuard, CrateType, DebugInfo, InstrumentMcount, LinkerFeaturesCli, OutFileName,
     OutputFilenames, OutputType, PrintKind, SplitDwarfKind, Strip,
@@ -50,7 +51,7 @@ use rustc_target::spec::crt_objects::CrtObjects;
 use rustc_target::spec::{
     Arch, BinaryFormat, Cc, CfgAbi, Env, LinkOutputKind, LinkSelfContainedComponents,
     LinkSelfContainedDefault, LinkerFeatures, LinkerFlavor, LinkerFlavorCli, Lld, Os, RelocModel,
-    RelroLevel, SanitizerSet, SplitDebuginfo,
+    RelroLevel, SplitDebuginfo,
 };
 use tracing::{debug, info, warn};
 

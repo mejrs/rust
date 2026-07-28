@@ -27,8 +27,9 @@ use rustc_abi::Align;
 use rustc_ast::ast;
 use rustc_data_structures::fx::{FxHashMap, FxHashSet, FxIndexSet};
 use rustc_lint_defs::builtin::EXPLICIT_BUILTIN_CFGS_IN_FLAGS;
+use rustc_sanitize::SanitizerSet;
 use rustc_span::{Symbol, sym};
-use rustc_target::spec::{PanicStrategy, RelocModel, SanitizerSet, Target};
+use rustc_target::spec::{PanicStrategy, RelocModel, Target};
 
 use crate::config::{CrateType, FmtDebug};
 use crate::{Session, diagnostics};

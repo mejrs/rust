@@ -1,5 +1,7 @@
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::base::apple::{Arch, TargetEnv, base};
-use crate::spec::{Os, SanitizerSet, Target, TargetMetadata, TargetOptions};
+use crate::spec::{Os, Target, TargetMetadata, TargetOptions};
 
 pub(crate) fn target() -> Target {
     // x86_64-apple-ios is a simulator target, even though it isn't declared

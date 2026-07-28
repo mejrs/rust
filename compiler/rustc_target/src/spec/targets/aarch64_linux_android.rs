@@ -1,5 +1,7 @@
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, FramePointer, SanitizerSet, StackProbeType, Target, TargetMetadata, TargetOptions, base,
+    Arch, FramePointer, StackProbeType, Target, TargetMetadata, TargetOptions, base,
 };
 
 // See https://developer.android.com/ndk/guides/abis.html#arm64-v8a

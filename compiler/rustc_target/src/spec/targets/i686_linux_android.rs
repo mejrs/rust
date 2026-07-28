@@ -1,6 +1,6 @@
-use crate::spec::{
-    Arch, RustcAbi, SanitizerSet, StackProbeType, Target, TargetMetadata, TargetOptions, base,
-};
+use rustc_sanitize::SanitizerSet;
+
+use crate::spec::{Arch, RustcAbi, StackProbeType, Target, TargetMetadata, TargetOptions, base};
 
 // See https://developer.android.com/ndk/guides/abis.html#x86
 // for target ABI requirements.

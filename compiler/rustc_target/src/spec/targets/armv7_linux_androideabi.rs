@@ -1,6 +1,7 @@
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, Cc, CfgAbi, FloatAbi, LinkerFlavor, Lld, SanitizerSet, Target, TargetMetadata,
-    TargetOptions, base,
+    Arch, Cc, CfgAbi, FloatAbi, LinkerFlavor, Lld, Target, TargetMetadata, TargetOptions, base,
 };
 
 // This target if is for the baseline of the Android v7a ABI

@@ -4,9 +4,11 @@
 // `target-cpu` compiler flags to opt-in more hardware-specific
 // features.
 
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, Cc, CodeModel, LinkerFlavor, Lld, PanicStrategy, RelroLevel, RustcAbi, SanitizerSet,
-    StackProbeType, Target, TargetMetadata, TargetOptions,
+    Arch, Cc, CodeModel, LinkerFlavor, Lld, PanicStrategy, RelroLevel, RustcAbi, StackProbeType,
+    Target, TargetMetadata, TargetOptions,
 };
 
 pub(crate) fn target() -> Target {

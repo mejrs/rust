@@ -22,6 +22,7 @@ use rustc_errors::{
 };
 use rustc_feature::UnstableFeatures;
 use rustc_macros::StableHash;
+use rustc_sanitize::SanitizerSet;
 pub use rustc_span::def_id::StableCrateId;
 use rustc_span::edition::Edition;
 use rustc_span::source_map::{FilePathMapping, SourceMap};
@@ -29,8 +30,8 @@ use rustc_span::{RealFileName, Span, Symbol};
 use rustc_target::asm::InlineAsmArch;
 use rustc_target::spec::{
     Arch, CfgAbi, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel,
-    SanitizerSet, SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility,
-    Target, TargetTuple, TlsModel, apple,
+    SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility, Target,
+    TargetTuple, TlsModel, apple,
 };
 
 use crate::code_stats::CodeStats;

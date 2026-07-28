@@ -22,11 +22,12 @@ use rustc_middle::ty::layout::{
     TyAndLayout,
 };
 use rustc_middle::ty::{self, Instance, Ty, TyCtxt};
+use rustc_sanitize::SanitizerSet;
 use rustc_sanitizer_support::{cfi, kcfi};
 use rustc_session::config::OptLevel;
 use rustc_span::Span;
 use rustc_target::callconv::{FnAbi, PassMode};
-use rustc_target::spec::{Arch, HasTargetSpec, SanitizerSet, Target};
+use rustc_target::spec::{Arch, HasTargetSpec, Target};
 use smallvec::SmallVec;
 use tracing::{debug, instrument};
 

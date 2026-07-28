@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 
+use rustc_sanitize::SanitizerSet;
+
 use crate::spec::{
-    Arch, CodeModel, LlvmAbi, SanitizerSet, SplitDebuginfo, Target, TargetMetadata, TargetOptions,
-    base,
+    Arch, CodeModel, LlvmAbi, SplitDebuginfo, Target, TargetMetadata, TargetOptions, base,
 };
 
 pub(crate) fn target() -> Target {

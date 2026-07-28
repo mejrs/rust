@@ -3818,6 +3818,7 @@ dependencies = [
  "rustc_macros",
  "rustc_metadata",
  "rustc_middle",
+ "rustc_sanitize",
  "rustc_sanitizer_support",
  "rustc_session",
  "rustc_span",
@@ -3856,6 +3857,7 @@ dependencies = [
  "rustc_metadata",
  "rustc_middle",
  "rustc_mir_transform",
+ "rustc_sanitize",
  "rustc_serialize",
  "rustc_session",
  "rustc_span",
@@ -4094,10 +4096,9 @@ dependencies = [
  "rustc_index",
  "rustc_lint_defs",
  "rustc_macros",
- "rustc_sanitizer",
+ "rustc_sanitize",
  "rustc_serialize",
  "rustc_span",
- "rustc_target",
  "smallvec",
  "thin-vec",
  "tracing",
@@ -4417,6 +4418,7 @@ dependencies = [
  "rustc_index",
  "rustc_lint_defs",
  "rustc_macros",
+ "rustc_sanitize",
  "rustc_serialize",
  "rustc_session",
  "rustc_span",
@@ -4705,7 +4707,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustc_sanitizer"
+name = "rustc_sanitize"
 version = "0.0.0"
 dependencies = [
  "bitflags",
@@ -4760,6 +4762,7 @@ dependencies = [
  "rustc_hir",
  "rustc_lint_defs",
  "rustc_macros",
+ "rustc_sanitize",
  "rustc_serialize",
  "rustc_span",
  "rustc_target",
@@ -4819,7 +4822,7 @@ dependencies = [
  "rustc_error_messages",
  "rustc_fs_util",
  "rustc_macros",
- "rustc_sanitizer",
+ "rustc_sanitize",
  "rustc_serialize",
  "rustc_span",
  "schemars",

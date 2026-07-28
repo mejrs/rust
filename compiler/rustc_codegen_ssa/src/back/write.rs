@@ -21,6 +21,7 @@ use rustc_metadata::fs::copy_to_stdout;
 use rustc_middle::bug;
 use rustc_middle::dep_graph::{WorkProduct, WorkProductMap};
 use rustc_middle::ty::TyCtxt;
+use rustc_sanitize::SanitizerSet;
 use rustc_session::Session;
 use rustc_session::config::{
     self, CrateType, Lto, OptLevel, OutFileName, OutputFilenames, OutputType, Passes,
@@ -28,7 +29,7 @@ use rustc_session::config::{
 };
 use rustc_span::source_map::SourceMap;
 use rustc_span::{FileName, InnerSpan, Span, SpanData};
-use rustc_target::spec::{MergeFunctions, SanitizerSet};
+use rustc_target::spec::MergeFunctions;
 use tracing::debug;
 
 use crate::back::link::ensure_removed;

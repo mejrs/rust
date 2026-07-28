@@ -3130,12 +3130,12 @@ pub(crate) mod dep_tracking {
     use rustc_feature::UnstableFeatures;
     use rustc_hashes::Hash64;
     use rustc_hir::attrs::CollapseMacroDebuginfo;
+    use rustc_sanitize::SanitizerSet;
     use rustc_span::edition::Edition;
     use rustc_span::{RealFileName, RemapPathScopeComponents};
     use rustc_target::spec::{
         CodeModel, FramePointer, MergeFunctions, OnBrokenPipe, PanicStrategy, RelocModel,
-        RelroLevel, SanitizerSet, SplitDebuginfo, StackProtector, SymbolVisibility, TargetTuple,
-        TlsModel,
+        RelroLevel, SplitDebuginfo, StackProtector, SymbolVisibility, TargetTuple, TlsModel,
     };
 
     use super::{
