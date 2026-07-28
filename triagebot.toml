@@ -602,7 +602,7 @@ trigger_files = [
 
 [autolabel."PG-exploit-mitigations"]
 trigger_files = [
-    "compiler/rustc_sanitizers",
+    "compiler/rustc_sanitizer_support",
     "src/doc/rustc/src/exploit-mitigations.md",
     "src/doc/unstable-book/src/compiler-flags/branch-protection.md",
     "src/doc/unstable-book/src/compiler-flags/cf-protection.md",
@@ -1328,7 +1328,7 @@ This PR modifies `tests/ui/issues/`. If this PR is adding new tests to `tests/ui
 please refrain from doing so, and instead add it to more descriptive subdirectories.
 """
 
-[mentions."compiler/rustc_sanitizers"]
+[mentions."compiler/rustc_sanitizer_support"]
 cc = ["@rcvalle"]
 
 [mentions."src/doc/rustc/src/exploit-mitigations.md"]

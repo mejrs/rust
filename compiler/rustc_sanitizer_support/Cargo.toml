@@ -1,5 +1,5 @@
 [package]
-name = "rustc_sanitizers"
+name = "rustc_sanitizer_support"
 version = "0.0.0"
 edition = "2024"
 

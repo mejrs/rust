@@ -18,7 +18,7 @@ use rustc_abi::AddressSpace;
 use rustc_codegen_ssa::traits::{MiscCodegenMethods, TypeMembershipCodegenMethods};
 use rustc_data_structures::fx::FxIndexSet;
 use rustc_middle::ty::{Instance, Ty};
-use rustc_sanitizers::{cfi, kcfi};
+use rustc_sanitizer_support::{cfi, kcfi};
 use rustc_target::callconv::FnAbi;
 use smallvec::SmallVec;
 use tracing::debug;

@@ -3818,7 +3818,7 @@ dependencies = [
  "rustc_macros",
  "rustc_metadata",
  "rustc_middle",
- "rustc_sanitizers",
+ "rustc_sanitizer_support",
  "rustc_session",
  "rustc_span",
  "rustc_symbol_mangling",
@@ -4094,6 +4094,7 @@ dependencies = [
  "rustc_index",
  "rustc_lint_defs",
  "rustc_macros",
+ "rustc_sanitizer",
  "rustc_serialize",
  "rustc_span",
  "rustc_target",
@@ -4704,7 +4705,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustc_sanitizers"
+name = "rustc_sanitizer"
+version = "0.0.0"
+dependencies = [
+ "bitflags",
+ "rustc_data_structures",
+ "rustc_macros",
+ "rustc_serialize",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "rustc_sanitizer_support"
 version = "0.0.0"
 dependencies = [
  "bitflags",
@@ -4806,6 +4819,7 @@ dependencies = [
  "rustc_error_messages",
  "rustc_fs_util",
  "rustc_macros",
+ "rustc_sanitizer",
  "rustc_serialize",
  "rustc_span",
  "schemars",
