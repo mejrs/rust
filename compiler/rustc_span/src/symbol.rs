@@ -497,6 +497,7 @@ symbols! {
         attr,
         attr_literals,
         attribute,
+        attribute_syntax,
         attributes,
         audit_that,
         augmented_assignments,
@@ -2531,6 +2532,7 @@ pub enum IdentPrintMode {
     Normal,
     RawIdent,
     RawLifetime,
+    AttrIdent,
 }
 
 /// The most general type to print identifiers.
@@ -2598,6 +2600,10 @@ impl fmt::Display for IdentPrinter {
                     .strip_prefix("'")
                     .expect("only lifetime idents should be passed with RawLifetime mode");
                 Symbol::intern(s)
+            }
+            IdentPrintMode::AttrIdent => {
+                f.write_str("a#")?;
+                self.symbol
             }
         };
         s.fmt(f)

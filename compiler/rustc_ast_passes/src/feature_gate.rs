@@ -512,6 +512,7 @@ pub fn check_crate(krate: &ast::Crate, sess: &Session, features: &Features) {
         half_open_range_patterns_in_slices,
         "half-open range patterns in slices are unstable"
     );
+    gate_all!(attribute_syntax, "attribute syntax is unstable");
 
     // `associated_const_equality` will be stabilized as part of `min_generic_const_args`.
     for &span in spans.get(&sym::associated_const_equality).into_flat_iter() {

@@ -1,0 +1,11 @@
+error[E0433]: cannot find `skip` in `rustfmt`
+  --> $DIR/tool.rs:9:14
+   |
+LL | #[a#rustfmt::skip]
+   |              ^^^^ could not find `skip` in `rustfmt`
+   |
+   = note: -Ztrack-diagnostics: created at compiler/rustc_resolve/src/diagnostics/impls.rs:1151:31
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

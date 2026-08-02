@@ -239,6 +239,16 @@ impl<'psess, 'src> Lexer<'psess, 'src> {
                     self.psess.raw_identifier_spans.push(span);
                     token::Ident(sym, IdentIsRaw::Yes)
                 }
+                rustc_lexer::TokenKind::AttrIdent => {
+                    let sym = nfc_normalize(self.str_from(start + BytePos(2)));
+                    let span = self.mk_sp(start, self.pos);
+                    self.psess.symbol_gallery.insert(sym, span);
+                    if !sym.can_be_raw() {
+                        self.dcx().emit_err(crate::diagnostics::CannotBeRawIdent { span, ident: sym });
+                    }
+                       self.psess.gated_spans.gate(sym::attribute_syntax, span);
+                    token::Ident(sym, IdentIsRaw::Yes)
+                }
                 rustc_lexer::TokenKind::UnknownPrefix => {
                     self.report_unknown_prefix(start);
                     self.ident(start)

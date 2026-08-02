@@ -117,6 +117,10 @@ Tests focused on the -Zassumptions-on-binders flag.
 
 Tests for the async/await related features. E.g. async functions, await expressions, and their interaction with other language features.
 
+## `tests/ui/attribute_syntax`: Attribute Syntax
+
+Refer to builtin and tool attributes unambiguously.
+
 ## `tests/ui/attributes`: Compiler Attributes
 
 Tests for language attributes and compiler attributes. E.g. built-in attributes like `#[derive(..)]`, `#[cfg(..)]`, and `#[repr(..)]`, or proc-macro attributes. See [Attributes | Reference](https://doc.rust-lang.org/reference/attributes.html).

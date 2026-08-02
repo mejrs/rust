@@ -11,7 +11,8 @@ use rustc_parse::lexer::{StripTokens, nfc_normalize};
 use rustc_parse::parser::Parser;
 use rustc_parse::{exp, new_parser_from_source_str, source_str_to_stream};
 use rustc_proc_macro::bridge::{
-    DelimSpan, Diagnostic, ExpnGlobals, Group, Ident, LitKind, Literal, Punct, TokenTree, server,
+    DelimSpan, Diagnostic, ExpnGlobals, Group, Ident, LitKind, Literal, Punct, Rawness, TokenTree,
+    server,
 };
 use rustc_proc_macro::{Delimiter, Level};
 use rustc_session::Session;
@@ -230,12 +231,18 @@ impl FromInternal<TokenStream> for Vec<TokenTree<TokenStream, Span, Symbol>> {
 
                 tk::Ident(sym, is_raw) => trees.push(TokenTree::Ident(Ident {
                     sym,
-                    is_raw: matches!(is_raw, tk::IdentIsRaw::Yes),
+                    rawness: match is_raw {
+                        tk::IdentIsRaw::Yes => Rawness::Raw,
+                        tk::IdentIsRaw::No => Rawness::None,
+                    },
                     span,
                 })),
                 tk::NtIdent(ident, is_raw) => trees.push(TokenTree::Ident(Ident {
                     sym: ident.name,
-                    is_raw: matches!(is_raw, tk::IdentIsRaw::Yes),
+                    rawness: match is_raw {
+                        tk::IdentIsRaw::Yes => Rawness::Raw,
+                        tk::IdentIsRaw::No => Rawness::None,
+                    },
                     span: ident.span,
                 })),
 
@@ -245,7 +252,10 @@ impl FromInternal<TokenStream> for Vec<TokenTree<TokenStream, Span, Symbol>> {
                         TokenTree::Punct(Punct { ch: b'\'', joint: true, span }),
                         TokenTree::Ident(Ident {
                             sym: ident.name,
-                            is_raw: matches!(is_raw, tk::IdentIsRaw::Yes),
+                            rawness: match is_raw {
+                                tk::IdentIsRaw::Yes => Rawness::Raw,
+                                tk::IdentIsRaw::No => Rawness::None,
+                            },
                             span,
                         }),
                     ]);
@@ -364,9 +374,13 @@ impl ToInternal<SmallVec<[tokenstream::TokenTree; 2]>>
                     stream.unwrap_or_default(),
                 )]
             }
-            TokenTree::Ident(self::Ident { sym, is_raw, span }) => {
+            TokenTree::Ident(self::Ident { sym, rawness, span }) => {
                 rustc.psess().symbol_gallery.insert(sym, span);
-                smallvec![tokenstream::TokenTree::token_alone(tk::Ident(sym, is_raw.into()), span)]
+                let rawness = match rawness {
+                    Rawness::Raw | Rawness::Attr => tk::IdentIsRaw::Yes,
+                    Rawness::None => tk::IdentIsRaw::No,
+                };
+                smallvec![tokenstream::TokenTree::token_alone(tk::Ident(sym, rawness), span)]
             }
             TokenTree::Literal(self::Literal {
                 kind: self::LitKind::Integer,

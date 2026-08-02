@@ -58,6 +58,7 @@ pub enum PathStyle {
     /// anyway, due to macros), but it is used to avoid weird suggestions about expected
     /// tokens when something goes wrong.
     Mod,
+    Attr,
 }
 
 impl PathStyle {
@@ -176,7 +177,8 @@ impl<'a> Parser<'a> {
             //
             //     m!(inline<u8>); //~ ERROR: unexpected generic arguments in path
             //
-            if style == PathStyle::Mod && path.segments.iter().any(|segment| segment.args.is_some())
+            if matches!(style, PathStyle::Mod | PathStyle::Attr)
+                && path.segments.iter().any(|segment| segment.args.is_some())
             {
                 let span = path
                     .segments

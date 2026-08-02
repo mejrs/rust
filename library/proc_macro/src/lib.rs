@@ -62,6 +62,7 @@ use rustc_literal_escaper::{
 #[unstable(feature = "proc_macro_totokens", issue = "130977")]
 pub use to_tokens::ToTokens;
 
+use crate::bridge::Rawness;
 use crate::bridge::client::Methods as BridgeMethods;
 use crate::escape::{EscapeOptions, escape_bytes};
 
@@ -1198,7 +1199,7 @@ impl Ident {
     pub fn new(string: &str, span: Span) -> Ident {
         Ident(bridge::Ident {
             sym: bridge::client::Symbol::new_ident(string, false),
-            is_raw: false,
+            rawness: Rawness::None,
             span: span.0,
         })
     }
@@ -1211,7 +1212,7 @@ impl Ident {
     pub fn new_raw(string: &str, span: Span) -> Ident {
         Ident(bridge::Ident {
             sym: bridge::client::Symbol::new_ident(string, true),
-            is_raw: true,
+            rawness: Rawness::Raw,
             span: span.0,
         })
     }
@@ -1235,8 +1236,14 @@ impl Ident {
 #[stable(feature = "proc_macro_lib2", since = "1.29.0")]
 impl fmt::Display for Ident {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.0.is_raw {
-            f.write_str("r#")?;
+        match self.0.rawness {
+            Rawness::Raw => {
+                f.write_str("r#")?;
+            }
+            Rawness::Attr => {
+                f.write_str("a#")?;
+            }
+            Rawness::None => {}
         }
         fmt::Display::fmt(&self.0.sym, f)
     }

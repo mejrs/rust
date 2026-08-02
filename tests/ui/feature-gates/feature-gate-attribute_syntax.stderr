@@ -1,0 +1,23 @@
+error[E0658]: attribute syntax is unstable
+  --> $DIR/feature-gate-attribute_syntax.rs:5:7
+   |
+LL |     #[a#repr(C)]
+   |       ^^^^^^
+   |
+   = note: see issue #133333337 <https://github.com/rust-lang/rust/issues/133333337> for more information
+   = help: add `#![feature(attribute_syntax)]` to the crate attributes to enable
+   = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+
+error[E0658]: attribute syntax is unstable
+  --> $DIR/feature-gate-attribute_syntax.rs:12:9
+   |
+LL |     let a#foo = 42;
+   |         ^^^^^
+   |
+   = note: see issue #133333337 <https://github.com/rust-lang/rust/issues/133333337> for more information
+   = help: add `#![feature(attribute_syntax)]` to the crate attributes to enable
+   = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0658`.

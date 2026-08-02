@@ -101,6 +101,9 @@ pub enum TokenKind {
     /// A raw identifier, e.g. "r#ident".
     RawIdent,
 
+    /// An attribute identifier, e.g. `a#attr`.
+    AttrIdent,
+
     /// An unknown literal prefix, like `foo#`, `foo'`, `foo"`. Excludes
     /// literal prefixes that contain emoji, which are considered "invalid".
     ///
@@ -583,6 +586,18 @@ impl<'a> Cursor<'a> {
                     }
                     let kind = RawStr { n_hashes: res.ok() };
                     Literal { kind, suffix_start }
+                }
+                _ => self.ident_or_unknown_prefix(),
+            },
+
+            // Attribute identifier
+            'a' => match (self.first(), self.second()) {
+                ('#', c1) if is_id_start(c1) => {
+                    // Eat "#" symbol.
+                    self.bump();
+                    // Eat the identifier part of RawIdent.
+                    self.eat_identifier();
+                    AttrIdent
                 }
                 _ => self.ident_or_unknown_prefix(),
             },

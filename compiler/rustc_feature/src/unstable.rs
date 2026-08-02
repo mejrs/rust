@@ -420,6 +420,8 @@ declare_features! (
     (unstable, async_for_loop, "1.77.0", Some(118898)),
     /// Allows `async` trait bound modifier.
     (unstable, async_trait_bounds, "1.85.0", Some(62290)),
+    /// Allows unambiguously specifying a builtin or tool attribute
+    (unstable, attribute_syntax, "CURRENT_RUSTC_VERSION", Some(133333337)),
     /// Target features on avr.
     (unstable, avr_target_feature, "1.95.0", Some(146889)),
     /// Allows using Intel AVX10 target features and intrinsics

@@ -226,6 +226,7 @@ mark_noop! {
     Level,
     Bound<usize>,
     Range<usize>,
+    Rawness,
 }
 
 rpc_encode_decode!(
@@ -384,13 +385,28 @@ pub struct Punct<Span> {
 compound_traits!(struct Punct<Span> { ch, joint, span });
 
 #[derive(Copy, Clone, Eq, PartialEq)]
+pub enum Rawness {
+    None,
+    Raw,
+    Attr,
+}
+
+rpc_encode_decode!(
+    enum Rawness {
+        None,
+        Raw,
+        Attr,
+    }
+);
+
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Ident<Span, Symbol> {
     pub sym: Symbol,
-    pub is_raw: bool,
+    pub rawness: Rawness,
     pub span: Span,
 }
 
-compound_traits!(struct Ident<Span, Symbol> { sym, is_raw, span });
+compound_traits!(struct Ident<Span, Symbol> { sym, rawness, span });
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct Literal<Span, Symbol> {

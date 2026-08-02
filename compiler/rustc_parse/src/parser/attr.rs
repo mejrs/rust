@@ -445,7 +445,7 @@ impl<'a> Parser<'a> {
         }
         let lo = self.token.span;
 
-        let path = self.parse_path(PathStyle::Mod)?;
+        let path = self.parse_path(PathStyle::Attr)?;
         let kind = self.parse_meta_item_kind()?;
         let span = lo.to(self.prev_token.span);
 
