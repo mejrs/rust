@@ -1,0 +1,29 @@
+error[E0659]: `repr` is ambiguous
+  --> $DIR/builtin.rs:17:3
+   |
+LL | #[a#repr]
+   |   ^^^^^^ ambiguous name
+   |
+   = note: -Ztrack-diagnostics: created at compiler/rustc_resolve/src/diagnostics/impls.rs:371:28
+   = note: ambiguous because of a name conflict with a builtin attribute
+   = note: `repr` could refer to a built-in attribute
+note: `repr` could also refer to the attribute macro imported here
+  --> $DIR/builtin.rs:15:5
+   |
+LL | use x::repr;
+   |     ^^^^^^^
+   = help: use `crate::repr` to refer to this attribute macro unambiguously
+
+error[E0539]: malformed `repr` attribute input
+  --> $DIR/builtin.rs:17:3
+   |
+LL | #[a#repr]
+   |   ^^^^^^ expected this to be a list
+   |
+   = note: -Ztrack-diagnostics: created at compiler/rustc_attr_parsing/src/interface.rs:308:51
+   = note: for more information, visit <https://doc.rust-lang.org/reference/type-layout.html#representations>
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0539, E0659.
+For more information about an error, try `rustc --explain E0539`.

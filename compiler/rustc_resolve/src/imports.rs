@@ -1740,6 +1740,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                     None,
                     decls[ns].get().decl(),
                     None,
+                    false,
                 ) {
                     Ok(other_binding) => {
                         is_redundant = binding.res() == other_binding.res()

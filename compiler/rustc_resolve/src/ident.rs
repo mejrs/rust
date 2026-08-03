@@ -353,6 +353,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                     finalize.map(|finalize| Finalize { used: Used::Scope, ..finalize }),
                     ignore_decl,
                     None,
+                    false,
                 )
             {
                 // The ident resolves to an item in a block.
@@ -370,6 +371,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                         finalize,
                         ignore_decl,
                         None,
+                        false,
                     )
                     .ok()
                     .map(LateDecl::Decl);
@@ -396,9 +398,12 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
         finalize: Option<Finalize>,
         ignore_decl: Option<Decl<'ra>>,
         ignore_import: Option<Import<'ra>>,
+        attr_syntax: bool,
     ) -> Result<Decl<'ra>, Determinacy> {
+        let mut key = IdentKey::new(orig_ident);
+        key.attr_syntax = attr_syntax;
         self.resolve_ident_in_scope_set_inner(
-            IdentKey::new(orig_ident),
+            key,
             orig_ident.span,
             scope_set,
             parent_scope,
@@ -457,7 +462,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
             orig_ident_span,
             derive_fallback_lint_id,
             |mut this, scope, use_prelude, ctxt| {
-                let ident = IdentKey { name: ident.name, ctxt };
+                let ident = IdentKey { name: ident.name, attr_syntax: ident.attr_syntax, ctxt };
                 let res = match this.reborrow().resolve_ident_in_scope(
                     ident,
                     orig_ident_span,
@@ -1042,6 +1047,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 finalize,
                 ignore_decl,
                 ignore_import,
+                false,
             ),
             ModuleOrUniformRoot::ExternPrelude => {
                 if ns != TypeNS {
@@ -1091,6 +1097,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                     finalize,
                     ignore_decl,
                     ignore_import,
+                    false,
                 )
             }
         }
@@ -2020,6 +2027,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                     finalize,
                     ignore_decl,
                     ignore_import,
+                    false, // maybe?
                 )
             };
 

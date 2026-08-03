@@ -332,10 +332,7 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
         };
         let (ext, res) = if inert {
             let res = match &*path.segments {
-                [builtin] => match self.builtin_attr_decls.get(&builtin.ident.name) {
-                    Some(_decl) => Res::NonMacroAttr(NonMacroAttrKind::Builtin(builtin.ident.name)),
-                    None => return Err(Indeterminate),
-                },
+                [_single] => unreachable!("not handled here, since they do not need resolving"),
                 [tool, ..] => match self.registered_attr_tool_decls.get(&IdentKey::new(tool.ident))
                 {
                     Some(_decl) => Res::NonMacroAttr(NonMacroAttrKind::Tool),
@@ -343,7 +340,6 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
                 },
                 [] => unreachable!(),
             };
-
             (self.dummy_ext(MacroKind::Attr), res)
         } else {
             self.smart_resolve_macro_path(
@@ -463,11 +459,9 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
                             if !ext.helper_attrs.is_empty() {
                                 let span = resolution.path.segments.last().unwrap().ident.span;
                                 let ctxt = Macros20NormalizedSyntaxContext::new(span.ctxt());
-                                entry.helper_attrs.extend(
-                                    ext.helper_attrs
-                                        .iter()
-                                        .map(|&name| (i, IdentKey { name, ctxt }, span)),
-                                );
+                                entry.helper_attrs.extend(ext.helper_attrs.iter().map(|&name| {
+                                    (i, IdentKey { name, attr_syntax: false, ctxt }, span)
+                                }));
                             }
                             entry.has_derive_copy |= ext.builtin_name == Some(sym::Copy);
                             entry.has_derive_ord |= ext.builtin_name == Some(sym::Ord);
@@ -902,6 +896,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 None,
                 None,
                 None,
+                false,
             );
             let binding = binding.map_err(|determinacy| {
                 Determinacy::determined(determinacy == Determinacy::Determined || force)
@@ -1092,6 +1087,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 Some(Finalize::new(ast::CRATE_NODE_ID, ident.span)),
                 None,
                 None,
+                false,
             ) {
                 Ok(binding) => {
                     let initial_res = initial_binding.map(|initial_binding| {
@@ -1146,6 +1142,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 Some(Finalize::new(ast::CRATE_NODE_ID, ident.span)),
                 None,
                 None,
+                false,
             );
         }
     }
@@ -1236,6 +1233,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 None,
                 None,
                 None,
+                false,
             );
             if let Ok(fallback_binding) = fallback_binding
                 && fallback_binding.res().opt_def_id() == Some(def_id)

@@ -2011,6 +2011,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 None,
                 None,
                 None,
+                false,
             ) else {
                 continue;
             };
@@ -3073,6 +3074,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                             None,
                             ignore_decl,
                             ignore_import,
+                            false,
                         )
                         .ok()
                 };
@@ -3186,6 +3188,7 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 None,
                 ignore_decl,
                 ignore_import,
+                false,
             ) {
                 let descr = binding.res().descr();
                 let message = format!("cannot find module or crate `{ident}` in {scope}");

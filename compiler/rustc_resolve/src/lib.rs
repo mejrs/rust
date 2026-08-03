@@ -573,25 +573,30 @@ impl ModuleKind {
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 struct IdentKey {
     name: Symbol,
+    attr_syntax: bool,
     ctxt: Macros20NormalizedSyntaxContext,
 }
 
 impl IdentKey {
     #[inline]
     fn new(ident: Ident) -> IdentKey {
-        IdentKey { name: ident.name, ctxt: Macros20NormalizedSyntaxContext::new(ident.span.ctxt()) }
+        IdentKey {
+            name: ident.name,
+            attr_syntax: false,
+            ctxt: Macros20NormalizedSyntaxContext::new(ident.span.ctxt()),
+        }
     }
 
     #[inline]
     fn new_adjusted(ident: Ident, expn_id: ExpnId) -> (IdentKey, Option<ExpnId>) {
         let (ctxt, def) = Macros20NormalizedSyntaxContext::new_adjusted(ident.span.ctxt(), expn_id);
-        (IdentKey { name: ident.name, ctxt }, def)
+        (IdentKey { name: ident.name, attr_syntax: false, ctxt }, def)
     }
 
     #[inline]
     fn with_root_ctxt(name: Symbol) -> Self {
         let ctxt = Macros20NormalizedSyntaxContext::new_unchecked(SyntaxContext::root());
-        IdentKey { name, ctxt }
+        IdentKey { name, ctxt, attr_syntax: false }
     }
 
     #[inline]
