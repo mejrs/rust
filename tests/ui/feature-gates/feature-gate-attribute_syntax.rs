@@ -11,4 +11,5 @@ mod foo{
 fn foo(){
     let a#foo = 42;
     //~^ ERROR attribute syntax is unstable [E0658]
+    //~| ERROR expected pattern, found `a#foo`
 }

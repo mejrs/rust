@@ -2804,6 +2804,7 @@ impl<'a> Parser<'a> {
                                             None,
                                             Path {
                                                 span: new_span,
+
                                                 segments: thin_vec![
                                                     PathSegment::from_ident(*old_ident),
                                                     PathSegment::from_ident(*ident),

@@ -595,7 +595,7 @@ impl<'a> Cursor<'a> {
                 ('#', c1) if is_id_start(c1) => {
                     // Eat "#" symbol.
                     self.bump();
-                    // Eat the identifier part of RawIdent.
+                    // Eat the identifier part of AttrIdent.
                     self.eat_identifier();
                     AttrIdent
                 }

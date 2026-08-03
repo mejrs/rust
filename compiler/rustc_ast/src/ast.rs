@@ -3485,6 +3485,7 @@ impl NormalAttr {
         Self {
             item: AttrItem {
                 unsafety: Safety::Default,
+                attr_syntax: false,
                 path: Path::from_ident(ident),
                 args: AttrArgs::Empty,
                 span: ident.span,
@@ -3497,6 +3498,7 @@ impl NormalAttr {
 #[derive(Clone, Encodable, Decodable, Debug, Walkable)]
 pub struct AttrItem {
     pub unsafety: Safety,
+    pub attr_syntax: bool,
     pub path: Path,
     pub args: AttrArgs,
     /// The span of the entire attr item. For parse attrs this excludes `#[`/`]`. E.g.:

@@ -292,20 +292,21 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
         };
 
         let (mut derives, mut inner_attr, mut deleg_impl) = (&[][..], false, None);
-        let (path, kind) = match invoc.kind {
+        let (path, kind, inert) = match invoc.kind {
             InvocationKind::Attr { ref attr, derives: ref attr_derives, .. } => {
                 derives = self.arenas.alloc_ast_paths(attr_derives);
                 inner_attr = attr.style == ast::AttrStyle::Inner;
-                (&attr.get_normal_item().path, MacroKind::Attr)
+                let inert = matches!(attr.kind, ast::AttrKind::Normal(ref n) if n.item.attr_syntax);
+                (&attr.get_normal_item().path, MacroKind::Attr, inert)
             }
-            InvocationKind::Bang { ref mac, .. } => (&mac.path, MacroKind::Bang),
-            InvocationKind::Derive { ref path, .. } => (path, MacroKind::Derive),
+            InvocationKind::Bang { ref mac, .. } => (&mac.path, MacroKind::Bang, false),
+            InvocationKind::Derive { ref path, .. } => (path, MacroKind::Derive, false),
             InvocationKind::GlobDelegation { ref item, .. } => {
                 let ast::AssocItemKind::DelegationMac(deleg) = &item.kind else { unreachable!() };
                 let DelegationSuffixes::Glob(star_span) = deleg.suffixes else { unreachable!() };
                 deleg_impl = Some((invocation_parent.parent_def, star_span));
                 // It is sufficient to consider glob delegation a bang macro for now.
-                (&deleg.prefix, MacroKind::Bang)
+                (&deleg.prefix, MacroKind::Bang, false)
             }
         };
 
@@ -329,18 +330,37 @@ impl<'ra, 'tcx> ResolverExpand for Resolver<'ra, 'tcx> {
             }
             _ => None,
         };
-        let (ext, res) = self.smart_resolve_macro_path(
-            path,
-            kind,
-            supports_macro_expansion,
-            inner_attr,
-            parent_scope,
-            node_id,
-            force,
-            deleg_impl,
-            looks_like_invoc_in_mod_inert_attr,
-            sugg_span,
-        )?;
+        let (ext, res) = if inert {
+            let res = match &*path.segments {
+                [builtin] => match self.builtin_attr_decls.get(&builtin.ident.name) {
+                    Some(_decl) => Res::NonMacroAttr(NonMacroAttrKind::Builtin(builtin.ident.name)),
+                    None => return Err(Indeterminate),
+                },
+                [tool, ..] => match self.registered_attr_tool_decls.get(&IdentKey::new(tool.ident))
+                {
+                    Some(_decl) => Res::NonMacroAttr(NonMacroAttrKind::Tool),
+                    None => return Err(Indeterminate),
+                },
+                [] => unreachable!(),
+            };
+
+            (self.dummy_ext(MacroKind::Attr), res)
+        } else {
+            self.smart_resolve_macro_path(
+                path,
+                kind,
+                supports_macro_expansion,
+                inner_attr,
+                parent_scope,
+                node_id,
+                force,
+                deleg_impl,
+                looks_like_invoc_in_mod_inert_attr,
+                sugg_span,
+            )?
+        };
+
+        self.check_diagnostic_tool(res, path, node_id);
 
         let span = invoc.span();
         let def_id = if deleg_impl.is_some() { None } else { res.opt_def_id() };
@@ -742,6 +762,10 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
             feature_err(&self.tcx.sess, sym::custom_inner_attributes, path.span, msg).emit();
         }
 
+        Ok((ext, res))
+    }
+
+    fn check_diagnostic_tool(&self, res: Res, path: &ast::Path, node_id: NodeId) {
         const DIAGNOSTIC_ATTRIBUTES: &[(Symbol, Option<Symbol>)] = &[
             (sym::on_unimplemented, None),
             (sym::do_not_recommend, None),
@@ -795,8 +819,6 @@ impl<'ra, 'tcx> Resolver<'ra, 'tcx> {
                 diagnostics::UnknownDiagnosticAttribute { help },
             );
         }
-
-        Ok((ext, res))
     }
 
     pub(crate) fn resolve_derive_macro_path<'r>(

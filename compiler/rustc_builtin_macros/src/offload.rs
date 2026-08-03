@@ -113,6 +113,7 @@ pub(crate) fn expand_kernel(
     // unsafe(no_mangle) attr
     let unsafe_item = AttrItem {
         unsafety: ast::Safety::Unsafe(span),
+        attr_syntax: false,
         path: ast::Path::from_ident(Ident::new(sym::no_mangle, span)),
         args: ast::AttrArgs::Empty,
         span,
@@ -178,6 +179,7 @@ pub(crate) fn expand_kernel(
 
     let inline_item = ast::AttrItem {
         unsafety: ast::Safety::Default,
+        attr_syntax: false,
         path: ast::Path::from_ident(Ident::with_dummy_span(sym::inline)),
         args: ast::AttrArgs::Delimited(never_arg),
         span: DUMMY_SP,

@@ -505,6 +505,8 @@ pub enum TokenKind {
     /// the `ident` metavariable in the macro's RHS.
     NtIdent(sp::Ident, IdentIsRaw),
 
+    AttrIdent(Symbol),
+
     /// Lifetime identifier token.
     /// Do not forget about `NtLifetime` when you want to match on lifetime identifiers.
     /// It's recommended to use `Token::{ident,uninterpolate}` and
@@ -652,7 +654,7 @@ impl Token {
 
             OpenParen | CloseParen | OpenBrace | CloseBrace | OpenBracket | CloseBracket
             | OpenInvisible(_) | CloseInvisible(_) | Literal(..) | DocComment(..) | Ident(..)
-            | NtIdent(..) | Lifetime(..) | NtLifetime(..) | Eof => false,
+            | NtIdent(..) | Lifetime(..) | NtLifetime(..) | AttrIdent(_) | Eof => false,
         }
     }
 
@@ -1068,7 +1070,7 @@ impl Token {
                 | Comma | Semi | PathSep | RArrow | LArrow | FatArrow | Pound | Dollar | Question
                 | OpenParen | CloseParen | OpenBrace | CloseBrace | OpenBracket | CloseBracket
                 | OpenInvisible(_) | CloseInvisible(_) | Literal(..) | Ident(..) | NtIdent(..)
-                | Lifetime(..) | NtLifetime(..) | DocComment(..) | Eof,
+                | Lifetime(..) | NtLifetime(..) | DocComment(..) | AttrIdent(_) | Eof,
                 _,
             ) => {
                 return None;

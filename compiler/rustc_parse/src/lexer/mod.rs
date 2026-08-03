@@ -247,7 +247,7 @@ impl<'psess, 'src> Lexer<'psess, 'src> {
                         self.dcx().emit_err(crate::diagnostics::CannotBeRawIdent { span, ident: sym });
                     }
                        self.psess.gated_spans.gate(sym::attribute_syntax, span);
-                    token::Ident(sym, IdentIsRaw::Yes)
+                    token::AttrIdent(sym)
                 }
                 rustc_lexer::TokenKind::UnknownPrefix => {
                     self.report_unknown_prefix(start);

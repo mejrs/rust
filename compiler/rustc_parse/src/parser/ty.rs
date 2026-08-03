@@ -1037,7 +1037,7 @@ impl<'a> Parser<'a> {
         ty_generics: Option<&Generics>,
     ) -> PResult<'a, TyKind> {
         // Simple path
-        let path = self.parse_path_inner(PathStyle::Type, ty_generics)?;
+        let path = self.parse_path_inner(PathStyle::Type, ty_generics)?.0;
         if self.eat(exp!(Bang)) {
             // Macro invocation in type position
             Ok(TyKind::MacCall(Box::new(MacCall { path, args: self.parse_delim_args()? })))

@@ -1,11 +1,15 @@
-error[E0433]: cannot find `skip` in `rustfmt`
-  --> $DIR/tool.rs:9:14
+error: unknown diagnostic attribute
+  --> $DIR/tool.rs:9:17
    |
-LL | #[a#rustfmt::skip]
-   |              ^^^^ could not find `skip` in `rustfmt`
+LL | #[a#diagnostic::doesnt_exist]
+   |                 ^^^^^^^^^^^^
    |
-   = note: -Ztrack-diagnostics: created at compiler/rustc_resolve/src/diagnostics/impls.rs:1151:31
+   = note: -Ztrack-diagnostics: created at compiler/rustc_lint/src/early.rs:39:26
+note: the lint level is defined here
+  --> $DIR/tool.rs:3:9
+   |
+LL | #![deny(unknown_diagnostic_attributes)]
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: aborting due to 1 previous error
 
-For more information about this error, try `rustc --explain E0433`.

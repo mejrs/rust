@@ -806,6 +806,7 @@ impl<'a> TraitDef<'a> {
                 cx.attr_nested(
                     rustc_ast::AttrItem {
                         unsafety: Safety::Default,
+                        attr_syntax: false,
                         path: rustc_const_unstable,
                         args: AttrArgs::Delimited(DelimArgs {
                             dspan: DelimSpan::from_single(self.span),

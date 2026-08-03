@@ -1,10 +1,11 @@
 //@edition: 2021
 //@compile-flags: -Z track-diagnostics
-
+#![deny(unknown_diagnostic_attributes)]
 #![crate_type = "lib"]
 #![feature(attribute_syntax)]
 
-mod rustfmt {}
+mod diagnostic {}
 
-#[a#rustfmt::skip]
+#[a#diagnostic::doesnt_exist]
+//~^ ERROR unknown diagnostic attribute
 struct Foo;

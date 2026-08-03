@@ -339,14 +339,14 @@ impl<'a> Parser<'a> {
                 ast::Safety::Default
             };
 
-            let path = this.parse_path(PathStyle::Mod)?;
+            let (path, attr_syntax) = this.parse_attr_path()?;
             let args = this.parse_attr_args()?;
             if is_unsafe {
                 this.expect(exp!(CloseParen))?;
             }
             let span = lo.to(this.prev_token.span);
             Ok((
-                WithTokens::new(ast::AttrItem { unsafety, path, args, span }),
+                WithTokens::new(ast::AttrItem { unsafety, attr_syntax, path, args, span }),
                 Trailing::No,
                 UsePreAttrPos::No,
             ))

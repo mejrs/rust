@@ -360,6 +360,7 @@ mod llvm_enzyme {
         };
         let inline_item = ast::AttrItem {
             unsafety: ast::Safety::Default,
+            attr_syntax: false,
             path: ast::Path::from_ident(Ident::with_dummy_span(sym::inline)),
             args: ast::AttrArgs::Delimited(never_arg),
             span: DUMMY_SP,

@@ -20,7 +20,7 @@ use rustc_ast::{
 };
 use rustc_span::edition::Edition;
 use rustc_span::source_map::SourceMap;
-use rustc_span::symbol::IdentPrinter;
+use rustc_span::symbol::{IdentPrintMode, IdentPrinter};
 use rustc_span::{
     BytePos, CharPos, DUMMY_SP, FileName, Ident, Pos, Span, Spanned, Symbol, kw, sym,
 };
@@ -1083,6 +1083,9 @@ pub trait PrintState<'a>: std::ops::Deref<Target = pp::Printer> + std::ops::Dere
             }
             tk::NtIdent(ident, is_raw) => {
                 IdentPrinter::for_ast_ident(ident, is_raw.to_print_mode_ident()).to_string().into()
+            }
+            tk::AttrIdent(name) => {
+                IdentPrinter::new(name, IdentPrintMode::AttrIdent, None).to_string().into()
             }
 
             tk::Lifetime(name, is_raw) | tk::NtLifetime(Ident { name, .. }, is_raw) => {

@@ -149,8 +149,12 @@ impl<'a> Parser<'a> {
         true
     }
 
+    pub fn parse_attr_path(&mut self) -> PResult<'a, (Path, bool)> {
+        self.parse_path_inner(PathStyle::Attr, None)
+    }
+
     pub fn parse_path(&mut self, style: PathStyle) -> PResult<'a, Path> {
-        self.parse_path_inner(style, None)
+        Ok(self.parse_path_inner(style, None)?.0)
     }
 
     /// Parses simple paths.
@@ -167,7 +171,7 @@ impl<'a> Parser<'a> {
         &mut self,
         style: PathStyle,
         ty_generics: Option<&Generics>,
-    ) -> PResult<'a, Path> {
+    ) -> PResult<'a, (Path, bool)> {
         let reject_generics_if_mod_style = |parser: &Parser<'_>, path: Path| {
             // Ensure generic arguments don't end up in attribute paths, such as:
             //
@@ -193,9 +197,9 @@ impl<'a> Parser<'a> {
                     .iter()
                     .map(|segment| PathSegment { ident: segment.ident, id: segment.id, args: None })
                     .collect();
-                Path { segments, ..path }
+                (Path { segments, ..path }, false)
             } else {
-                path
+                (path, false)
             }
         };
 
@@ -219,8 +223,8 @@ impl<'a> Parser<'a> {
         if self.eat_path_sep() {
             segments.push(PathSegment::path_root(lo.shrink_to_lo().with_ctxt(mod_sep_ctxt)));
         }
-        self.parse_path_segments(&mut segments, style, ty_generics)?;
-        Ok(Path { segments, span: lo.to(self.prev_token.span) })
+        let attr_syntax = self.parse_path_segments(&mut segments, style, ty_generics)?;
+        Ok((Path { segments, span: lo.to(self.prev_token.span) }, attr_syntax))
     }
 
     pub(super) fn parse_path_segments(
@@ -228,9 +232,23 @@ impl<'a> Parser<'a> {
         segments: &mut ThinVec<PathSegment>,
         style: PathStyle,
         ty_generics: Option<&Generics>,
-    ) -> PResult<'a, ()> {
+    ) -> PResult<'a, bool> {
+        let mut leading_attr_syntax = false;
         loop {
-            let segment = self.parse_path_segment(style, ty_generics)?;
+            let (segment, attr_syntax) = self.parse_path_segment(style, ty_generics)?;
+            if segments.is_empty() {
+                leading_attr_syntax = attr_syntax;
+            } else if attr_syntax {
+                let err = self.dcx().struct_span_err(
+                    segment.span(),
+                    "attribute syntax in a non-leading segment is not allowed",
+                );
+                if self.may_recover() {
+                    err.emit();
+                } else {
+                    return Err(err);
+                }
+            }
             if style.has_generic_ambiguity() {
                 // In order to check for trailing angle brackets, we must have finished
                 // recursing (`parse_path_segment` can indirectly call this function),
@@ -277,7 +295,7 @@ impl<'a> Parser<'a> {
                     continue;
                 }
 
-                return Ok(());
+                return Ok(leading_attr_syntax);
             }
         }
     }
@@ -298,8 +316,13 @@ impl<'a> Parser<'a> {
         &mut self,
         style: PathStyle,
         ty_generics: Option<&Generics>,
-    ) -> PResult<'a, PathSegment> {
-        let ident = self.parse_path_segment_ident()?;
+    ) -> PResult<'a, (PathSegment, bool)> {
+        let (ident, attr_syntax) = if style == PathStyle::Attr {
+            self.parse_maybe_attr_ident()?
+        } else {
+            (self.parse_path_segment_ident()?, false)
+        };
+
         let is_args_start = |token: &Token| {
             matches!(token.kind, token::Lt | token::Shl | token::OpenParen | token::LArrow)
         };
@@ -455,12 +478,23 @@ impl<'a> Parser<'a> {
                     ParenthesizedArgs { span, inputs, inputs_span, output }.into()
                 };
 
-                PathSegment { ident, args: Some(args), id: ast::DUMMY_NODE_ID }
+                (PathSegment { ident, args: Some(args), id: ast::DUMMY_NODE_ID }, attr_syntax)
             } else {
                 // Generic arguments are not found.
-                PathSegment::from_ident(ident)
+                (PathSegment::from_ident(ident), attr_syntax)
             },
         )
+    }
+
+    fn parse_maybe_attr_ident(&mut self) -> PResult<'a, (Ident, bool)> {
+        match self.token.kind {
+            TokenKind::AttrIdent(name) => {
+                let span = self.token.span;
+                self.bump();
+                Ok((Ident { name, span }, true))
+            }
+            _ => Ok((self.parse_path_segment_ident()?, false)),
+        }
     }
 
     pub(super) fn parse_path_segment_ident(&mut self) -> PResult<'a, Ident> {

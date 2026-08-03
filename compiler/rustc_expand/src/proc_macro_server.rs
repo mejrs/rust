@@ -237,6 +237,7 @@ impl FromInternal<TokenStream> for Vec<TokenTree<TokenStream, Span, Symbol>> {
                     },
                     span,
                 })),
+
                 tk::NtIdent(ident, is_raw) => trees.push(TokenTree::Ident(Ident {
                     sym: ident.name,
                     rawness: match is_raw {
@@ -245,7 +246,9 @@ impl FromInternal<TokenStream> for Vec<TokenTree<TokenStream, Span, Symbol>> {
                     },
                     span: ident.span,
                 })),
-
+                tk::AttrIdent(sym) => {
+                    trees.push(TokenTree::Ident(Ident { sym, rawness: Rawness::Attr, span }))
+                }
                 tk::Lifetime(name, is_raw) => {
                     let ident = rustc_span::Ident::new(name, span).without_first_quote();
                     trees.extend([
