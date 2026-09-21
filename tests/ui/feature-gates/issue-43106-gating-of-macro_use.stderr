@@ -34,7 +34,7 @@ LL -     #[macro_use = "2700"] struct S;
 LL +     #[macro_use(name1, name2, ...)] struct S;
    |
 
-warning: the `macro_use` attribute cannot be used on crates
+error: the `macro_use` attribute cannot be used on crates
   --> $DIR/issue-43106-gating-of-macro_use.rs:6:4
    |
 LL | #![macro_use(my_macro)]
@@ -42,9 +42,9 @@ LL | #![macro_use(my_macro)]
    |
    = help: the `macro_use` attribute can be applied to extern crates and modules
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
-   = note: requested on the command line with `-W unused-attributes`
+   = note: requested on the command line with `-D unused-attributes`
 
-warning: the `macro_use` attribute cannot be used on structs
+error: the `macro_use` attribute cannot be used on structs
   --> $DIR/issue-43106-gating-of-macro_use.rs:17:7
    |
 LL |     #[macro_use = "2700"] struct S;
@@ -53,7 +53,7 @@ LL |     #[macro_use = "2700"] struct S;
    = help: the `macro_use` attribute can be applied to extern crates and modules
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
 
-warning: the `macro_use` attribute cannot be used on functions
+error: the `macro_use` attribute cannot be used on functions
   --> $DIR/issue-43106-gating-of-macro_use.rs:22:7
    |
 LL |     #[macro_use] fn f() { }
@@ -62,7 +62,7 @@ LL |     #[macro_use] fn f() { }
    = help: the `macro_use` attribute can be applied to extern crates and modules
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
 
-warning: the `macro_use` attribute cannot be used on type aliases
+error: the `macro_use` attribute cannot be used on type aliases
   --> $DIR/issue-43106-gating-of-macro_use.rs:26:7
    |
 LL |     #[macro_use] type T = S;
@@ -71,7 +71,7 @@ LL |     #[macro_use] type T = S;
    = help: the `macro_use` attribute can be applied to extern crates and modules
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
 
-warning: the `macro_use` attribute cannot be used on inherent impl blocks
+error: the `macro_use` attribute cannot be used on inherent impl blocks
   --> $DIR/issue-43106-gating-of-macro_use.rs:30:7
    |
 LL |     #[macro_use] impl S { }
@@ -80,6 +80,6 @@ LL |     #[macro_use] impl S { }
    = help: the `macro_use` attribute can be applied to extern crates and modules
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
 
-error: aborting due to 4 previous errors; 5 warnings emitted
+error: aborting due to 9 previous errors
 
 For more information about this error, try `rustc --explain E0539`.

@@ -119,7 +119,7 @@ error[E0252]: the name `n` is defined multiple times
    |
 LL | use issue_52891::n;
    |     -------------- previous import of the module `n` here
-LL | #[macro_use]
+LL |
 LL | use issue_52891::n;
    |     ^^^^^^^^^^^^^^ `n` reimported here
    |

@@ -10,7 +10,7 @@ struct A0C0;
 
 // Zero attributes, one trailing comma
 #[cfg_attr(true,)]
-//~^ WARN `#[cfg_attr]` does not expand to any attributes
+//~^ ERROR `#[cfg_attr]` does not expand to any attributes
 struct A0C1;
 
 // Zero attributes, two trailing commas

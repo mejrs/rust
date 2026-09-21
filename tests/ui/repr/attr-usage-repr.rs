@@ -46,11 +46,11 @@ enum EInt {
 }
 
 #[repr()] //~ ERROR attribute cannot be used on
-//~^ WARN unused attribute
+//~^ ERROR unused attribute
 type SirThisIsAType = i32;
 
 #[repr()]
-//~^ WARN unused attribute
+//~^ ERROR unused attribute
 struct EmptyReprArgumentList(i32);
 
 fn main() {}

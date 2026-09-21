@@ -15,17 +15,17 @@
 //~| NOTE: the `rustc_main` attribute is used internally to specify test entry point function
 #![repr()]
 //~^ ERROR: attribute cannot be used
-//~| WARN unused attribute
+//~| ERROR unused attribute
 //~| NOTE empty list has no effect
 #![path = "3800"]
 //~^ ERROR: attribute cannot be used on
 #![automatically_derived]
 //~^ ERROR: attribute cannot be used on
 #![no_mangle]
-//~^ WARN may not be used in combination with `#[export_name]`
+//~^ ERROR may not be used in combination with `#[export_name]`
 //~| NOTE is ignored
 //~| NOTE requested on the command line
-//~| WARN cannot be used on crates
+//~| ERROR cannot be used on crates
 //~| WARN previously accepted
 #![no_link]
 //~^ ERROR: the `no_link` attribute cannot be used on crates
@@ -66,7 +66,7 @@ mod no_link {
         //~^ ERROR the `no_link` attribute cannot be used on functions
         match () {
             #[no_link]
-            //~^ WARN the `no_link` attribute cannot be used on match arms [unused_attributes]
+            //~^ ERROR the `no_link` attribute cannot be used on match arms [unused_attributes]
             //~| WARN this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
             _ => ()
         }
@@ -76,7 +76,7 @@ mod no_link {
     //~^ ERROR the `no_link` attribute cannot be used on structs
     struct S {
         #[no_link]
-        //~^ WARN the `no_link` attribute cannot be used on struct fields [unused_attributes]
+        //~^ ERROR the `no_link` attribute cannot be used on struct fields [unused_attributes]
         //~| WARN this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
         field: ()
     }
@@ -88,7 +88,7 @@ mod no_link {
     //~^ ERROR the `no_link` attribute cannot be used on inherent impl blocks
 
     #[no_link]
-    //~^ WARN the `no_link` attribute cannot be used on macro defs
+    //~^ ERROR the `no_link` attribute cannot be used on macro defs
     //~| WARN this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
     macro_rules! m{() => {}}
 }

@@ -77,18 +77,18 @@
 //~| ERROR attribute cannot be used on
 #[crate_name]
 //~^ ERROR malformed
-//~| WARN crate-level attribute should be an inner attribute
+//~| ERROR crate-level attribute should be an inner attribute
 #[target_feature]
 //~^ ERROR malformed
 #[export_stable = 1]
 //~^ ERROR malformed
 #[link]
 //~^ ERROR malformed
-//~| WARN attribute cannot be used on
+//~| ERROR attribute cannot be used on
 //~| WARN previously accepted
 #[link_name]
 //~^ ERROR malformed
-//~| WARN cannot be used on functions
+//~| ERROR cannot be used on functions
 //~| WARN previously accepted
 #[link_section]
 //~^ ERROR malformed
@@ -101,7 +101,7 @@
 //~| WARN this was previously accepted by the compiler
 #[no_implicit_prelude = 23]
 //~^ ERROR malformed
-//~| WARN cannot be used on functions
+//~| ERROR cannot be used on functions
 //~| WARN previously accepted
 #[proc_macro = 18]
 //~^ ERROR malformed
@@ -190,7 +190,7 @@ extern "C" {
 //~^ ERROR malformed `debugger_visualizer` attribute input
 #[automatically_derived = 18]
 //~^ ERROR malformed
-//~| WARN cannot be used on modules
+//~| ERROR cannot be used on modules
 //~| WARN previously accepted
 mod yooo {
 

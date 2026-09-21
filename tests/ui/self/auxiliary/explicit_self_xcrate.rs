@@ -1,3 +1,5 @@
+#![allow(unused_attributes)]
+
 pub trait Foo {
     #[inline(always)]
     fn f(&self);

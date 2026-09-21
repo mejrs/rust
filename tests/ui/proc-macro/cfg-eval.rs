@@ -1,4 +1,3 @@
-//@ check-pass
 //@ compile-flags: -Z span-debug
 //@ proc-macro: test-macros.rs
 
@@ -19,7 +18,7 @@ struct S1 {
     field_false: u8,
     #[cfg(true)]
     #[cfg_attr(FALSE, unknown_attr)]
-    #[cfg_attr(true, allow())] //~ WARN unused attribute
+    #[cfg_attr(true, allow())] //~ ERROR unused attribute
     field_true: u8,
 }
 

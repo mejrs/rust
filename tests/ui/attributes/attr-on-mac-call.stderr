@@ -44,7 +44,7 @@ error: attribute value must be a literal
 LL |     #[deprecated = concat!("woah", "dude")]
    |                    ^^^^^^^^^^^^^^^^^^^^^^^
 
-warning: the `export_name` attribute cannot be used on macro calls
+error: the `export_name` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:8:7
    |
 LL |     #[export_name = "x"]
@@ -53,13 +53,9 @@ LL |     #[export_name = "x"]
    = help: the `export_name` attribute can be applied to functions and statics
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
-note: the lint level is defined here
-  --> $DIR/attr-on-mac-call.rs:3:9
-   |
-LL | #![warn(unused_attributes)]
-   |         ^^^^^^^^^^^^^^^^^
+   = note: requested on the command line with `-D unused-attributes`
 
-warning: the `naked` attribute cannot be used on macro calls
+error: the `naked` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:11:14
    |
 LL |     #[unsafe(naked)]
@@ -69,7 +65,7 @@ LL |     #[unsafe(naked)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `track_caller` attribute cannot be used on macro calls
+error: the `track_caller` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:14:7
    |
 LL |     #[track_caller]
@@ -79,7 +75,7 @@ LL |     #[track_caller]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `used` attribute cannot be used on macro calls
+error: the `used` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:17:7
    |
 LL |     #[used]
@@ -89,7 +85,7 @@ LL |     #[used]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `target_feature` attribute cannot be used on macro calls
+error: the `target_feature` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:20:7
    |
 LL |     #[target_feature(enable = "x")]
@@ -99,7 +95,7 @@ LL |     #[target_feature(enable = "x")]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `deprecated` attribute cannot be used on macro calls
+error: the `deprecated` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:23:7
    |
 LL |     #[deprecated]
@@ -109,7 +105,7 @@ LL |     #[deprecated]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `inline` attribute cannot be used on macro calls
+error: the `inline` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:26:7
    |
 LL |     #[inline]
@@ -119,7 +115,7 @@ LL |     #[inline]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `link_name` attribute cannot be used on macro calls
+error: the `link_name` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:29:7
    |
 LL |     #[link_name = "x"]
@@ -129,7 +125,7 @@ LL |     #[link_name = "x"]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `link_section` attribute cannot be used on macro calls
+error: the `link_section` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:32:7
    |
 LL |     #[link_section = "__TEXT,__text"]
@@ -139,7 +135,7 @@ LL |     #[link_section = "__TEXT,__text"]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `link_ordinal` attribute cannot be used on macro calls
+error: the `link_ordinal` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:35:7
    |
 LL |     #[link_ordinal(42)]
@@ -149,7 +145,7 @@ LL |     #[link_ordinal(42)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `non_exhaustive` attribute cannot be used on macro calls
+error: the `non_exhaustive` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:38:7
    |
 LL |     #[non_exhaustive]
@@ -159,7 +155,7 @@ LL |     #[non_exhaustive]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `proc_macro` attribute cannot be used on macro calls
+error: the `proc_macro` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:41:7
    |
 LL |     #[proc_macro]
@@ -169,7 +165,7 @@ LL |     #[proc_macro]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `cold` attribute cannot be used on macro calls
+error: the `cold` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:44:7
    |
 LL |     #[cold]
@@ -179,7 +175,7 @@ LL |     #[cold]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `no_mangle` attribute cannot be used on macro calls
+error: the `no_mangle` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:47:7
    |
 LL |     #[no_mangle]
@@ -189,7 +185,7 @@ LL |     #[no_mangle]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `deprecated` attribute cannot be used on macro calls
+error: the `deprecated` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:50:7
    |
 LL |     #[deprecated]
@@ -199,7 +195,7 @@ LL |     #[deprecated]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `automatically_derived` attribute cannot be used on macro calls
+error: the `automatically_derived` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:53:7
    |
 LL |     #[automatically_derived]
@@ -209,7 +205,7 @@ LL |     #[automatically_derived]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `macro_use` attribute cannot be used on macro calls
+error: the `macro_use` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:56:7
    |
 LL |     #[macro_use]
@@ -219,7 +215,7 @@ LL |     #[macro_use]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `must_use` attribute cannot be used on macro calls
+error: the `must_use` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:59:7
    |
 LL |     #[must_use]
@@ -229,7 +225,7 @@ LL |     #[must_use]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `no_implicit_prelude` attribute cannot be used on macro calls
+error: the `no_implicit_prelude` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:62:7
    |
 LL |     #[no_implicit_prelude]
@@ -239,7 +235,7 @@ LL |     #[no_implicit_prelude]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `path` attribute cannot be used on macro calls
+error: the `path` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:65:7
    |
 LL |     #[path = ""]
@@ -249,7 +245,7 @@ LL |     #[path = ""]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `ignore` attribute cannot be used on macro calls
+error: the `ignore` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:68:7
    |
 LL |     #[ignore]
@@ -259,7 +255,7 @@ LL |     #[ignore]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `should_panic` attribute cannot be used on macro calls
+error: the `should_panic` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:71:7
    |
 LL |     #[should_panic]
@@ -269,7 +265,7 @@ LL |     #[should_panic]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `link_name` attribute cannot be used on macro calls
+error: the `link_name` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:74:7
    |
 LL |     #[link_name = "x"]
@@ -279,7 +275,7 @@ LL |     #[link_name = "x"]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `repr()` attribute cannot be used on macro calls
+error: the `repr()` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:81:7
    |
 LL |     #[repr()]
@@ -289,7 +285,7 @@ LL |     #[repr()]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: unused attribute
+error: unused attribute
   --> $DIR/attr-on-mac-call.rs:81:5
    |
 LL |     #[repr()]
@@ -297,7 +293,7 @@ LL |     #[repr()]
    |
    = note: using `repr` with an empty list has no effect
 
-warning: the `repr(u8)` attribute cannot be used on macro calls
+error: the `repr(u8)` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:86:7
    |
 LL |     #[repr(u8)]
@@ -307,7 +303,7 @@ LL |     #[repr(u8)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `repr(align(...))` attribute cannot be used on macro calls
+error: the `repr(align(...))` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:90:7
    |
 LL |     #[repr(align(8))]
@@ -317,7 +313,7 @@ LL |     #[repr(align(8))]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `repr(packed)` attribute cannot be used on macro calls
+error: the `repr(packed)` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:94:7
    |
 LL |     #[repr(packed)]
@@ -327,7 +323,7 @@ LL |     #[repr(packed)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `repr(C)` attribute cannot be used on macro calls
+error: the `repr(C)` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:98:7
    |
 LL |     #[repr(C)]
@@ -337,7 +333,7 @@ LL |     #[repr(C)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-warning: the `repr(Rust)` attribute cannot be used on macro calls
+error: the `repr(Rust)` attribute cannot be used on macro calls
   --> $DIR/attr-on-mac-call.rs:102:7
    |
 LL |     #[repr(Rust)]
@@ -347,6 +343,6 @@ LL |     #[repr(Rust)]
    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
    = note: placing this attribute on a macro invocation does nothing even if the macro expands to what would be a valid target for the attribute
 
-error: aborting due to 5 previous errors; 30 warnings emitted
+error: aborting due to 35 previous errors
 
 For more information about this error, try `rustc --explain E0658`.

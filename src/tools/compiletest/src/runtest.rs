@@ -1961,7 +1961,7 @@ impl<'test> TestCx<'test> {
         // overwrite this.
         // Don't allow `unused_attributes` since these are usually actual mistakes, rather than just unused code.
         if let AllowUnused::Yes = allow_unused {
-            compiler.args(&["-A", "unused", "-W", "unused_attributes"]);
+            compiler.args(&["-A", "unused", "-D", "unused_attributes"]);
         }
 
         // Allow tests to use internal and incomplete features.

@@ -874,7 +874,7 @@ declare_lint! {
     ///
     /// [attributes]: https://doc.rust-lang.org/reference/attributes.html
     pub UNUSED_ATTRIBUTES,
-    Warn,
+    Deny,
     "detects attributes that were not used by the compiler"
 }
 

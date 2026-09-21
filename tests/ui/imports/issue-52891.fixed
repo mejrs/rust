@@ -29,7 +29,8 @@ use issue_52891::b::inner as other_inner; //~ ERROR `inner` is defined multiple 
 
 //~^ ERROR `issue_52891` is defined multiple times
 
-#[macro_use]
-use issue_52891::n; //~ ERROR `n` is defined multiple times
+use issue_52891::n;
+
+ //~ ERROR `n` is defined multiple times
 
 fn main() {}

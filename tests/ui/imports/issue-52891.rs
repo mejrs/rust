@@ -32,7 +32,7 @@ use issue_52891::{self};
 //~^ ERROR `issue_52891` is defined multiple times
 
 use issue_52891::n;
-#[macro_use]
+
 use issue_52891::n; //~ ERROR `n` is defined multiple times
 
 fn main() {}

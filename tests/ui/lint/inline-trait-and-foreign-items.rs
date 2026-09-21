@@ -1,11 +1,9 @@
 #![feature(extern_types)]
 #![feature(impl_trait_in_assoc_type)]
 
-#![warn(unused_attributes)]
-
 trait Trait {
-    #[inline] //~ WARN attribute cannot be used on
-//~| WARN previously accepted
+    #[inline] //~ ERROR attribute cannot be used on
+    //~| WARN previously accepted
     const X: u32;
 
     #[inline] //~ ERROR attribute cannot be used on
@@ -15,8 +13,8 @@ trait Trait {
 }
 
 impl Trait for () {
-    #[inline] //~ WARN attribute cannot be used on
-//~| WARN previously accepted
+    #[inline] //~ ERROR attribute cannot be used on
+    //~| WARN previously accepted
     const X: u32 = 0;
 
     #[inline] //~ ERROR attribute cannot be used on

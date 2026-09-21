@@ -4,10 +4,10 @@
 //~^ ERROR malformed `no_std` attribute input
 #![no_std("bar")]
 //~^ ERROR malformed `no_std` attribute input
-//~| WARN unused attribute
+//~| ERROR unused attribute
 #![no_std(foo = "bar")]
 //~^ ERROR malformed `no_std` attribute input
-//~| WARN unused attribute
+//~| ERROR unused attribute
 #![no_core = "foo"]
 //~^ ERROR malformed `no_core` attribute input
 #![no_core("bar")]

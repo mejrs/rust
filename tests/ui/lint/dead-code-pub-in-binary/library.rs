@@ -1,6 +1,6 @@
 #![deny(dead_code)]
 #![deny(dead_code_pub_in_binary)]
-//~^ WARN unused attribute
+//~^ ERROR unused attribute
 
 #![crate_type = "lib"]
 
