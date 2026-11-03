@@ -34,7 +34,7 @@ fn get(
 pub(crate) struct DeprecatedParser;
 impl SingleAttributeParser for DeprecatedParser {
     const PATH: &[Symbol] = &[sym::deprecated];
-    const ALLOWED_TARGETS: AllowedTargets<'_> = AllowedTargets::AllowListWarnRest(&[
+    const ALLOWED_TARGETS: AllowedTargets<'_> = AllowedTargets::AllowList(&[
         Allow(Target::Fn),
         Allow(Target::Mod),
         Allow(Target::Struct),
@@ -62,7 +62,7 @@ impl SingleAttributeParser for DeprecatedParser {
         Allow(Target::Variant),
         Allow(Target::Impl { of_trait: false }),
         Allow(Target::Crate),
-        Error(Target::WherePredicate),
+        Warn(Target::MacroCall), // #158816: ~100 regressions from `raw-cpuid`, `gtk`, `trust-dns-resolver`
     ]);
     const TEMPLATE: AttributeTemplate = template!(
         Word,

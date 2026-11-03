@@ -67,12 +67,9 @@ impl NoArgsAttributeParser for RustcShouldNotBeCalledOnConstItemsParser {
 pub(crate) struct AutomaticallyDerivedParser;
 impl NoArgsAttributeParser for AutomaticallyDerivedParser {
     const PATH: &[Symbol] = &[sym::automatically_derived];
-    const ON_DUPLICATE: OnDuplicate = OnDuplicate::Warn;
-    const ALLOWED_TARGETS: AllowedTargets<'_> = AllowedTargets::AllowListWarnRest(&[
-        Allow(Target::Impl { of_trait: true }),
-        Error(Target::Crate),
-        Error(Target::WherePredicate),
-    ]);
+
+    const ALLOWED_TARGETS: AllowedTargets<'_> =
+        AllowedTargets::AllowList(&[Allow(Target::Impl { of_trait: true })]);
     const STABILITY: AttributeStability = AttributeStability::Stable;
     const CREATE: fn(Span) -> AttributeKind = |_| AttributeKind::AutomaticallyDerived;
 }

@@ -4,7 +4,7 @@ use rustc_lint_defs::builtin::AMBIGUOUS_DERIVE_HELPERS;
 use super::prelude::*;
 
 const PROC_MACRO_ALLOWED_TARGETS: AllowedTargets<'_> =
-    AllowedTargets::AllowList(&[Allow(Target::Fn), Warn(Target::Crate), Warn(Target::MacroCall)]);
+    AllowedTargets::AllowList(&[Allow(Target::Fn)]);
 
 pub(crate) struct ProcMacroParser;
 impl NoArgsAttributeParser for ProcMacroParser {

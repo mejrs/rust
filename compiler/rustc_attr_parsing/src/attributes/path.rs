@@ -6,9 +6,8 @@ pub(crate) struct PathParser;
 
 impl SingleAttributeParser for PathParser {
     const PATH: &[Symbol] = &[sym::path];
-    const ON_DUPLICATE: OnDuplicate = OnDuplicate::WarnButFutureError;
-    const ALLOWED_TARGETS: AllowedTargets<'_> =
-        AllowedTargets::AllowListWarnRest(&[Allow(Target::Mod), Error(Target::Crate)]);
+
+    const ALLOWED_TARGETS: AllowedTargets<'_> = AllowedTargets::AllowList(&[Allow(Target::Mod)]);
     const TEMPLATE: AttributeTemplate = template!(
         NameValueStr: "file",
         "https://doc.rust-lang.org/reference/items/modules.html#the-path-attribute"
